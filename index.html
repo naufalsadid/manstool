@@ -135,12 +135,2234 @@
                         data: imageBase64
                     }
                 });
+<<<<<<< HEAD
+=======
+
+                setAnalysisLoading(false);
+            };
+
+            const handleGenerateScript = async () => {
+                if (!productTopic) return;
+
+                setScriptLoading(true);
+                await new Promise(resolve => setTimeout(resolve, 1500)); 
+
+                let scriptTemplate = '';
+                const baseTopic = productTopic;
+                const assumedFeature = "teknologi pelacakan langkah kaki yang super akurat dan desainnya yang stylish";
+                const assumedBenefit = "aku gak nyangka ini bisa membuat lari jarak jauhku jadi lebih mudah dan memotivasi aku setiap pagi";
+
+
+                switch (concept) {
+                    case "Promosi Affiliate":
+                        // FIX: Mengganti placeholder dengan kalimat langsung
+                        scriptTemplate = `Stop scroll! ${baseTopic} ini viral karena ${assumedFeature}. Harganya? Murah banget! Klik keranjang kuning sekarang sebelum kehabisan.`;
+                        break;
+                    case "Influencer AI":
+                        // FIX: Mengganti placeholder dengan kalimat langsung
+                        scriptTemplate = `Hai teman-teman. Aku baru coba ${baseTopic} dan jujur, ini mengubah game banget. Aku gak nyangka kalau ${assumedBenefit}. Kalian wajib coba sih!`;
+                        break;
+                    case "Konsep Custom":
+                        // FIX: Mengganti placeholder dengan kalimat langsung
+                        scriptTemplate = `Ini adalah skrip dasar untuk ${baseTopic}. Skrip ini sangat cocok untuk video tutorial singkat, menjelaskan fitur utama dan cara penggunaannya dalam 30 detik. Sesuaikan dengan deskripsi kustom Anda: ${customConceptDesc}`;
+                        break;
+                    default:
+                        scriptTemplate = `Skrip default untuk ${baseTopic}.`;
+                }
+
+                setDialogueScript(scriptTemplate.trim()); // Memastikan tidak ada tanda kutip ekstra
+                setScriptLoading(false);
+            };
+
+            const handleGeneratePrompt = () => {
+                setGenerateLoading(true);
+                setTimeout(() => {
+                    const baseVisual = productTopic || 'produk tidak teridentifikasi';
+                    const modeDetail = imageMode === "Single Camera" ? "a single, impactful scene" : "a story unfolding from start to finish";
+                    const moves = [move1, move2, move3].filter(m => m).join(', ');
+                    const dialogueSection = dialogueScript.trim() ? dialogueScript.trim() : 'Tidak Ada Dialog';
+                    
+                    let finalPrompt = '';
+                    let outputObject = {};
+                    
+                    const visualDescription = `A photorealistic video showcasing ${baseVisual}. The visual style is ${style}, framing for ${modeDetail}. The character performs these actions: ${moves}${customAction ? ` and ${customAction}` : ''}.`;
+
+                    switch (platform) {
+                        case "Meta AI":
+                            finalPrompt = `Imagine a short video based on the user's input.
+Visual Style: ${style}
+Action Sequence: ${moves}${customAction ? `, ${customAction}` : ''}
+Camera Move: ${cameraMove}
+Final Visual Prompt: ${visualDescription}
+`;
+                            setOutput({
+                                type: 'Meta AI Prompt',
+                                content: finalPrompt.trim()
+                            });
+                            break;
+
+                        case "Groq AI":
+                            finalPrompt = `
+[SCENE VISUALS]: ${visualDescription}
+[AUDIO/SPEECH]: Language: ${audioLang}, Accent: ${audioAccent}, Mode: ${audioMode}
+[TRANSCRIPT]: "${dialogueSection}" 
+[CAMERA]: ${cameraMove}
+`;
+                            setOutput({
+                                type: 'Groq AI Prompt',
+                                content: finalPrompt.trim()
+                            });
+                            break;
+
+                        case "JSON":
+                            outputObject = {
+                                product_topic: baseVisual,
+                                concept: concept,
+                                style: style,
+                                video_mode: imageMode,
+                                camera_move: cameraMove,
+                                actions: [move1, move2, move3].filter(m => m),
+                                custom_action: customAction || null,
+                                dialogue_script: dialogueSection,
+                                audio_settings: isDialogueVisible ? { language: audioLang, accent: audioAccent, mode: audioMode } : null
+                            };
+                            setOutput({
+                                type: 'JSON Output',
+                                content: JSON.stringify(outputObject, null, 2)
+                            });
+                            break;
+
+                        default:
+                            setOutput({ type: 'Error', content: 'Platform tidak valid.' });
+                    }
+                    setGenerateLoading(false);
+                }, 1000); 
+            };
+            
+            
+            // --- Render Logic ---
+            
+            const PlatformButton = ({ p }) => (
+                <button 
+                    key={p} 
+                    onClick={() => setPlatform(p)} 
+                    className={`
+                        px-4 py-2 font-semibold rounded-lg transition-all 
+                        border-2 border-slate-700 bg-slate-800 text-slate-400 
+                        hover:bg-slate-700 hover:border-indigo-500 
+                        focus:outline-none focus:ring-4 focus:ring-indigo-500/50 
+                        ${platform === p 
+                            ? 'border-indigo-400 text-indigo-200 bg-indigo-700/60 ring-4 ring-indigo-400/70' 
+                            : ''
+                        }
+                    `}
+                >
+                    <Icon name={p === "Meta AI" ? "Zap" : p === "Groq AI" ? "Book" : "Code"} className="inline mr-2" />
+                    {p}
+                </button>
+            );
+
+            const ModePill = ({ mode }) => (
+                <button
+                    key={mode}
+                    onClick={() => setImageMode(mode)}
+                    className={`
+                        px-3 py-1 text-sm rounded-full transition-all 
+                        border-2 border-slate-700 bg-slate-800 text-slate-400 
+                        hover:bg-slate-700 hover:border-purple-500 
+                        focus:outline-none focus:ring-4 focus:ring-purple-500/50 
+                        ${imageMode === mode 
+                            ? 'border-purple-400 text-purple-200 bg-purple-700/60 ring-4 ring-purple-400/70' 
+                            : ''
+                        }
+                    `}
+                >
+                    {mode}
+                </button>
+            );
+            
+            const StylePill = ({ opt }) => (
+                <button
+                    key={opt}
+                    onClick={() => setStyle(opt)}
+                    className={`
+                        px-3 py-1 text-sm rounded-full transition-all 
+                        border-2 border-slate-700 bg-slate-800 text-slate-400 
+                        hover:bg-slate-700 hover:border-purple-500 
+                        focus:outline-none focus:ring-4 focus:ring-purple-500/50 
+                        ${style === opt 
+                            ? 'border-purple-400 text-purple-200 bg-purple-700/60 ring-4 ring-purple-400/70' 
+                            : ''
+                        }
+                    `}
+                >
+                    {opt}
+                </button>
+            );
+
+            // Image Mode Toggles
+            const ImageModeToggles = IMAGE_MODES.map(mode => <ModePill key={mode} mode={mode} />);
+
+            // Style Pills
+            const StylePills = STYLE_OPTIONS.map(opt => <StylePill key={opt} opt={opt} />);
+            
+            return (
+                <div className="p-4 md:p-8 space-y-8 max-w-6xl mx-auto bg-slate-950 text-slate-200">
+                    <header className="text-center">
+                        <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-600">
+                            <Icon name="Sparkles" className="inline mr-3" size={35} /> UGC Prompt Generator
+                        </h1>
+                        <p className="text-slate-400">Buat panduan video yang terstruktur untuk alat AI atau skrip LLM</p>
+                    </header>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        
+                        {/* INPUTS COLUMN (COL 1 & 2) */}
+                        <div className="lg:col-span-2 space-y-8">
+                            
+                            {/* 1. Target Platform & Mode */}
+                            <div className="card p-6 space-y-4">
+                                <TitleBlock iconName="Camera" title="1. Target Platform & Mode" subtitle="Pilih platform output dan mode video Anda." />
+                                <div className="grid grid-cols-3 gap-3">
+                                    {PLATFORMS.map(p => <PlatformButton key={p} p={p} />)}
+                                </div>
+                                <div className="pt-2">
+                                    <h3 className="text-sm font-medium text-slate-300 mb-2">Mode Video:</h3>
+                                    <div className="flex gap-3">{ImageModeToggles}</div>
+                                </div>
+                            </div>
+                            
+                            {/* 2. Konsep & Analisis AI */}
+                            <div className="card p-6 space-y-4">
+                                <TitleBlock iconName="Users" title="2. Konsep & Analisis AI" subtitle="Tentukan alur cerita atau analisis visual produk." />
+                                
+                                <Dropdown 
+                                    id="concept" 
+                                    label="Pilih Konsep Video" 
+                                    value={concept} 
+                                    onChange={e => setConcept(e.target.value)} 
+                                    options={CONCEPTS} 
+                                />
+                                
+                                {isCustomConcept && (
+                                    <InputField 
+                                        id="customConceptDesc" 
+                                        label="Deskripsi Konsep Kustom" 
+                                        value={customConceptDesc} 
+                                        onChange={e => setCustomConceptDesc(e.target.value)} 
+                                        placeholder="Jelaskan detail yang harus diikuti oleh AI (misal: gaya hard selling dengan perbandingan 2 produk)."
+                                        type="textarea"
+                                    />
+                                )}
+
+                                {/* Image Analysis Section */}
+                                <div className="pt-4">
+                                    <h3 className="text-sm font-medium text-slate-300 mb-2">Analisis Gambar (Auto-fill Saran):</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        
+                                        <div className="md:col-span-1 border-2 border-slate-700 rounded-lg overflow-hidden relative">
+                                            <label htmlFor="image-file" className="ugc-file-upload-area p-0 ">
+                                                <div 
+                                                    className="w-full h-32 flex flex-col items-center justify-center p-4 cursor-pointer"
+                                                    style={{ 
+                                                        backgroundImage: `url(${imagePreviewUrl.includes('placehold.co') ? '' : imagePreviewUrl})`,
+                                                        backgroundSize: 'cover',
+                                                        backgroundPosition: 'center',
+                                                        backgroundColor: imagePreviewUrl.includes('placehold.co') ? '#1e293b' : 'transparent',
+                                                        transition: 'all 0.3s'
+                                                    }}
+                                                >
+                                                    {/* Jika placeholder, tampilkan ikon upload */}
+                                                    {imagePreviewUrl.includes('placehold.co') && (
+                                                        <div className="story-upload-placeholder relative !bg-transparent">
+                                                            <Icon name="UploadCloud" className="text-slate-500 mx-auto mb-2" size={36} />
+                                                            <span className="text-xs text-slate-400">Unggah Gambar Produk/Model</span>
+                                                        </div>
+                                                    )}
+                                                    
+                                                    {/* Jika sudah ada gambar, tampilkan tombol hapus/ganti */}
+                                                    {!imagePreviewUrl.includes('placehold.co') && (
+                                                         <div className="p-1 bg-black/50 backdrop-blur-sm rounded-lg text-xs text-slate-200">
+                                                            Klik untuk Ganti
+                                                         </div>
+                                                    )}
+                                                </div>
+                                                <input 
+                                                    type="file" 
+                                                    id="image-file" 
+                                                    className="hidden" 
+                                                    accept="image/*" 
+                                                    onChange={handleImageUpload} 
+                                                />
+                                            </label>
+                                            {/* UGC REMOVE BUTTON */}
+                                            {!imagePreviewUrl.includes('placehold.co') && (
+                                                <button
+                                                    onClick={(e) => { e.preventDefault(); handleRemoveImage(); }}
+                                                    className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1.5 shadow-md hover:bg-red-700 transition z-10"
+                                                    title="Hapus Gambar"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        <div className="md:col-span-2 flex items-center">
+                                            <GradientButton 
+                                                onClick={handleAnalyzeImage}
+                                                loading={analysisLoading}
+                                                disabled={!imageFile}
+                                            >
+                                                <Icon name="Users" className="mr-2" /> Analisis Gambar & Isi Otomatis
+                                            </GradientButton>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                             {/* 3. Gaya & Kamera */}
+                            <div className="card p-6 space-y-4">
+                                <TitleBlock iconName="Camera" title="3. Gaya & Kamera" subtitle="Tentukan visual sinematik dan pergerakan kamera." />
+                                
+                                <div className="pt-4 space-y-3">
+                                    <h3 className="text-sm font-medium text-slate-300 mb-2">Gaya Visual:</h3>
+                                    <div className="flex flex-wrap gap-2">{StylePills}</div>
+                                </div>
+                                
+                                <div className="pt-2">
+                                    <Dropdown id="cameraMove" label="Opsi Gerakan Kamera" value={cameraMove} onChange={e => setCameraMove(e.target.value)} options={availableCameras} />
+                                </div>
+                            </div>
+
+                            {/* 4. Kontrol Karakter & Audio */}
+                            <div className="card p-6 space-y-4">
+                                <TitleBlock iconName="Move" title="4. Kontrol Karakter & Audio" subtitle="Atur aksi karakter dan, jika diperlukan, pengaturan audio." />
+                                
+                                <div className="grid grid-cols-3 gap-4">
+                                    <Dropdown id="move1" label="Aksi 1 (Wajib)" value={move1} onChange={e => setMove1(e.target.value)} options={ACTION_PRESETS} />
+                                    <Dropdown id="move2" label="Aksi 2" value={move2} onChange={e => setMove2(e.target.value)} options={ACTION_PRESETS} />
+                                    <Dropdown id="move3" label="Aksi 3" value={move3} onChange={e => setMove3(e.target.value)} options={ACTION_PRESETS} />
+                                </div>
+                                <InputField 
+                                    id="customAction" 
+                                    label="Aksi Kustom Tambahan" 
+                                    value={customAction} 
+                                    onChange={e => setCustomAction(e.target.value)} 
+                                    placeholder="Contoh: Melompat kegirangan, berputar perlahan..."
+                                />
+                                
+                                {/* 4B. Script / Dialogue Section (Conditional, hidden when Meta AI is selected) */}
+                                {isDialogueVisible && (
+                                    <div className="space-y-4 border-t border-slate-700 pt-4">
+                                        <h3 className="text-lg font-semibold text-slate-100">Skrip Dialog (Groq/JSON)</h3>
+                                        <InputField 
+                                            id="productTopic" 
+                                            label="Produk/Topik untuk Skrip" 
+                                            value={productTopic} 
+                                            onChange={e => setProductTopic(e.target.value)} 
+                                            placeholder="Contoh: review jujur sepatu lari terbaru"
+                                        />
+                                        <div className="flex justify-end">
+                                            <button
+                                                onClick={handleGenerateScript}
+                                                disabled={!productTopic}
+                                                className="btn-secondary text-sm font-semibold py-2 px-4 rounded-lg flex items-center"
+                                            >
+                                                {scriptLoading ? <Icon name="Loader2" className="animate-spin mr-2 w-4 h-4" /> : 'Buat Skrip (Mock LLM)'}
+                                            </button>
+                                        </div>
+                                        <InputField 
+                                            id="dialogueScript" 
+                                            label="Hasil Skrip Audio" 
+                                            value={dialogueScript} 
+                                            onChange={e => setDialogueScript(e.target.value)} 
+                                            placeholder="Skrip otomatis akan muncul di sini"
+                                            type="textarea"
+                                            readOnly={false}
+                                        />
+                                        <div className="grid grid-cols-3 gap-4 pt-2">
+                                            <Dropdown id="audioLang" label="Bahasa" value={audioLang} onChange={e => setAudioLang(e.target.value)} options={LANGUAGE_OPTIONS} />
+                                            <Dropdown id="audioAccent" label="Aksen" value={audioAccent} onChange={e => setAudioAccent(e.target.value)} options={ACCENT_OPTIONS} />
+                                            <Dropdown id="audioMode" label="Mode Audio" value={audioMode} onChange={e => setAudioMode(e.target.value)} options={AUDIO_MODE_OPTIONS} />
+                                        </div>
+                                    </div>
+                                )}
+
+                            </div>
+                            
+                        </div>
+
+                        {/* OUTPUT COLUMN (COL 3) */}
+                        <div className="lg:col-span-1 space-y-6 lg:sticky lg:top-8 self-start">
+                            
+                            <div className="card p-6">
+                                <TitleBlock iconName="Send" title="5. Generate Prompt" subtitle={`Prompt akan diformat untuk: ${platform}`} />
+                                <GradientButton 
+                                    onClick={handleGeneratePrompt}
+                                    disabled={!productTopic && !imageFile && (!move1 && !move2 && !move3)}
+                                    loading={generateLoading}
+                                >
+                                    GENERATE PROMPT
+                                </GradientButton>
+                            </div>
+
+                            {/* Kotak Output yang selalu ditampilkan */}
+                            <div className="card p-6 space-y-4 min-h-[250px]">
+                                {output ? (
+                                    <>
+                                        <h3 className="text-xl font-semibold text-slate-100">{output.type} Output:</h3>
+                                        <div className="ugc-output-box text-slate-300 font-mono">
+                                            {output.content}
+                                        </div>
+                                        <button 
+                                            onClick={() => handleCopyOutput(output.content)}
+                                            className="w-full btn-secondary py-2 px-4 rounded-lg flex items-center justify-center"
+                                        >
+                                            <Icon name="Clipboard" className="mr-2" /> Salin Output
+                                        </button>
+                                    </>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center h-full text-center py-10">
+                                        <Icon name="Code" className="text-slate-600 mb-3" size={48} />
+                                        <p className="text-slate-400 italic">
+                                            Klik 'Generate Prompt' untuk melihat hasil!
+                                        </p>
+                                        <p className="text-xs text-slate-500 mt-4">
+                                            *Output berupa teks, kode, atau JSON, tergantung format yang dipilih.
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- NEW StoryGenerator Component ---
+
+        const STORY_GOALS = ["Promosi Produk (Hard Sell)", "Edukasional (Informatif)", "Pengalaman Pengguna (UGC Style)", "Storytelling Emosional (Soft Sell)"];
+        const STORY_LENGTHS = ["15 Detik (3 Scene)", "30 Detik (5 Scene)", "60 Detik (8 Scene)", "Durasi Kustom"]; // NEW OPTION
+        const STORY_CATEGORIES = ["Cerita Anak", "Horor/Thriller", "Edukasi/Tutorial", "Komedian", "Drama Remaja", "Dokumenter Alam", "Fiksi Ilmiah", "Fantasi/Sihir", "Kustom"]; // NEW CATEGORIES
+        
+        // Konstanta Base64 untuk Placeholder Warna Solid (Menghilangkan Teks)
+        const DARK_GRAY_PLACEHOLDER = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYGD4DwAEQGAVv2191QAAAABJRU5ErkJggg=='; // #1e293b
+        const ERROR_RED_PLACEHOLDER = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEgAGyFjR0AAAAAElFTkSuQmCC'; // #e02424
+
+        // FIX: MOCK ANALYSIS YANG LEBIH BAIK
+        const STORY_MOCK_ANALYSIS_SCENARIOS = [
+            { id: 'PRODUCT_SHOES', goal: STORY_GOALS[0], topic: "Sneakers Lari Ultra-Ringan Seri X", audience: "Atlet & Pelari", length: STORY_LENGTHS[0], category: STORY_CATEGORIES[2] },
+            { id: 'PRODUCT_APP', goal: STORY_GOALS[2], topic: "Aplikasi Budgeting Keuangan 'Finance Pro'", audience: "Pelajar & Mahasiswa", length: STORY_LENGTHS[1], category: STORY_CATEGORIES[2] },
+            { id: 'PRODUCT_SKINCARE', goal: STORY_GOALS[3], topic: "Serum Anti-Aging 'GlowUp'", audience: "Wanita 25-45 tahun", length: STORY_LENGTHS[1], category: STORY_CATEGORIES[3] },
+            { id: 'GENERIC_PROMO', goal: STORY_GOALS[0], topic: "Produk Baru yang Mengubah Hidup", audience: "Publik Umum", length: STORY_LENGTHS[1], category: STORY_CATEGORIES[3] },
+        ];
+        
+        // Mock Data Structure for Storyboard Output
+        const mockScenesTemplate = [
+            { title: "Pembukaan Dramatis", desc: `Close-up emosional pada karakter/produk. Menarik perhatian audiens.`, action: "Slow reveal, product is placed.", angle: "Extreme Close-up (ECU) / Low Angle", dialogue: "Anda lelah dengan..." },
+            { title: "Pengenalan Masalah", desc: `Karakter menunjukkan masalah yang diselesaikan.`, action: "Karakter terlihat frustasi saat mencoba solusi lama.", angle: "Medium Shot (MS) / Dolly Out", dialogue: "Inilah tantangan yang dihadapi." },
+            { title: "Solusi/Aksi Utama", desc: `Produk diperkenalkan sebagai pahlawan. Adegan cerah.`, action: "Karakter menggunakan produk dengan senyuman puas.", angle: "Close-up (CU) / Pan Right", dialogue: "Inilah jawabannya: Produk X." },
+            { title: "Manfaat/Visual Sekunder", desc: "Menampilkan fitur atau manfaat unik (B-roll).", action: "Montase adegan-adegan cepat yang menunjukkan manfaat.", angle: "High Angle Shot / Dutch Angle", dialogue: "Bukan hanya solusi, ini gaya hidup baru." },
+            { title: "CTA / Closing", desc: "Panggilan untuk bertindak yang kuat.", action: "Karakter menatap kamera dan mengangkat jempol/menunjuk CTA.", angle: "Eye Level / Steady Shot", dialogue: "Jangan tunggu lagi. Dapatkan Produk X hari ini!" },
+            // Longer scenes
+            { title: "Bonus Scene 1 (60s)", desc: "Testimoni singkat atau statistik.", action: "Transisi cepat ke teks di layar atau grafis statistik.", angle: "Static Shot / Graphic Overlay", dialogue: "9 dari 10 pengguna setuju..." },
+            { title: "Bonus Scene 2 (60s)", desc: "Ekstra detail atau garansi produk.", action: "Zoom in perlahan pada detail material atau logo produk.", angle: "Super Close-up / Macro Shot", dialogue: "Kualitas yang tidak tertandingi." },
+            { title: "Bonus Scene 3 (60s)", desc: "Mengingatkan nilai emosional.", action: "Karakter tersenyum puas dan berjalan menjauh.", angle: "Dolly Shot Out (Wide)", dialogue: "Hidup lebih mudah sekarang." }
+        ];
+
+        const StoryGenerator = () => {
+            const [goal, setGoal] = useState(STORY_GOALS[0]);
+            const [topic, setTopic] = useState('');
+            const [audience, setAudience] = useState('');
+            const [length, setLength] = useState(STORY_LENGTHS[1]);
+            const [customLengthInput, setCustomLengthInput] = useState('10 scenes'); // NEW STATE for Custom Length
+            const [videoRatio, setVideoRatio] = useState('16:9'); // NEW STATE for Ratio
+            const [category, setCategory] = useState(STORY_CATEGORIES[0]); // NEW STATE for Category
+            const [customCategory, setCustomCategory] = useState(''); // NEW STATE for Custom Category
+            
+            // Perbaikan: Tambahkan state untuk Base64 data
+            const [imageFile, setImageFile] = useState(null);
+            const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
+            const [imageBase64, setImageBase64] = useState(null);
+            const [imageMimeType, setImageMimeType] = useState(null);
+            
+            // Menyimpan data setiap scene (termasuk gambar mock)
+            const [storyScenes, setStoryScenes] = useState([]);
+            
+            const [storyOutput, setStoryOutput] = useState(null);
+            const [loading, setLoading] = useState(false);
+            const [analysisLoading, setAnalysisLoading] = useState(false); 
+            const [isPlanReady, setIsPlanReady] = useState(false); // NEW STATE for Phase 1 completion
+            const [showDetailedScript, setShowDetailedScript] = useState(false); // STATE BARU UNTUK TOGGLE
+            
+            const isCustomLength = length === "Durasi Kustom";
+            const isCustomCategory = category === "Kustom";
+
+            const getSceneCount = (len) => {
+                if (len.includes("15")) return 3;
+                if (len.includes("30")) return 5;
+                if (len.includes("60")) return 8;
+                // FIX: Jika kustom, kembalikan 10 scene
+                if (len === "Durasi Kustom") {
+                    const match = customLengthInput.match(/(\d+)/);
+                    if (match) {
+                        const number = parseInt(match[1], 10);
+                        return Math.min(Math.max(number, 3), 15); // Min 3, max 15 scenes
+                    }
+                    return 10; // Default if custom input is vague
+                }
+                
+                return 5; // Default if all else fails
+            };
+            
+            const handleImageUpload = (e) => {
+                const file = e.target.files[0];
+                // Pastikan input file direset setelah memilih
+                e.target.value = null; 
+                
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const parts = e.target.result.split(',');
+                        setImageBase64(parts[1]);
+                        setImageMimeType(parts[0].match(/:(.*?);/)[1]);
+                        setImageFile(file);
+                        setImagePreviewUrl(e.target.result);
+                        // Reset plan jika gambar diubah
+                        setIsPlanReady(false);
+                        setStoryScenes([]);
+                        setStoryOutput(null);
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    setImageFile(null);
+                    setImagePreviewUrl(null);
+                    setImageBase64(null);
+                    setImageMimeType(null);
+                    setIsPlanReady(false);
+                    setStoryScenes([]);
+                    setStoryOutput(null);
+                }
+            };
+            
+            // NEW: Handler untuk menghapus gambar Story/Visual Referensi
+            const handleRemoveImage = () => {
+                // Clear the hidden file input element (crucial for re-uploading the same file later)
+                const fileInput = document.getElementById('story-image-file');
+                if (fileInput) fileInput.value = null;
+
+                setImageFile(null);
+                setImagePreviewUrl(null);
+                setImageBase64(null);
+                setImageMimeType(null);
+                
+                // Clear derived plan states
+                setIsPlanReady(false);
+                setStoryScenes([]);
+                setStoryOutput(null);
+            };
+
+            // FIX: LOGIKA ANALISIS DITINGKATKAN
+            const handleAnalyzeImage = async () => {
+                if (!imageFile) {
+                    alert("Harap unggah gambar terlebih dahulu untuk dianalisis.");
+                    return;
+                }
+
+                setAnalysisLoading(true);
+                setStoryScenes([]);
+                setStoryOutput(null);
+                setIsPlanReady(false);
+                await new Promise(resolve => setTimeout(resolve, 2000)); 
+                
+                // Deterministic Mock Analysis based on filename/type (Simulasi AI)
+                let scenario = STORY_MOCK_ANALYSIS_SCENARIOS[3]; // Default: GENERIC_PROMO
+                const fileName = imageFile.name.toLowerCase();
+
+                if (fileName.includes('sepatu') || fileName.includes('shoe') || fileName.includes('lari')) {
+                    scenario = STORY_MOCK_ANALYSIS_SCENARIOS[0]; // PRODUCT_SHOES
+                } else if (fileName.includes('app') || fileName.includes('ui') || fileName.includes('aplikasi')) {
+                    scenario = STORY_MOCK_ANALYSIS_SCENARIOS[1]; // PRODUCT_APP
+                } else if (fileName.includes('skincare') || fileName.includes('serum') || fileName.includes('glow')) {
+                    scenario = STORY_MOCK_ANALYSIS_SCENARIOS[2]; // PRODUCT_SKINCARE
+                } else {
+                    // Jika tidak ada kata kunci, ambil acak dari 3 scenario utama
+                    const randomIndex = Math.floor(Math.random() * 3);
+                    scenario = STORY_MOCK_ANALYSIS_SCENARIOS[randomIndex];
+                }
+
+                // FIX PENTING: Update state input form di sini
+                setGoal(scenario.goal);
+                setTopic(scenario.topic);
+                setAudience(scenario.audience);
+                setLength(scenario.length);
+                setCategory(scenario.category); // FIX: Tambahkan kategori
+                
+                setStoryOutput({
+                    type: 'Rekomendasi AI',
+                    content: `[ANALISIS VISUAL SELESAI]\nAI menganalisis visual dan merekomendasikan:
+- Tujuan: ${scenario.goal}
+- Topik Utama: ${scenario.topic}
+- Target Audiens: ${scenario.audience}
+- Durasi: ${scenario.length}
+- Kategori: ${scenario.category}
+\nFormulir input telah terisi otomatis. Silakan tinjau dan klik 'GENERATE STORYBOARD' untuk membuat kerangka adegan.`
+                });
+
+                setAnalysisLoading(false);
+            };
+
+            // PHASE 1: Generate Story Plan (Textual Structure)
+            const generateStoryPlan = async () => {
+                const planTopic = topic.trim();
+                if (!planTopic) return;
+
+                setLoading(true);
+                setStoryScenes([]);
+                setStoryOutput(null);
+                setIsPlanReady(false);
+
+                // FIX: Menggunakan fungsi getSceneCount yang telah diperbarui
+                const sceneCount = getSceneCount(length);
+                const mainConcept = planTopic || "produk/layanan X";
+                const activeCategory = isCustomCategory ? customCategory : category; // Gunakan kustom jika dipilih
+                
+                // 1. Prepare Story Line Data Structure (Mock)
+                let finalScriptText = `[SKENARIO VIDEO PROFESIONAL - ${length.toUpperCase()}${isCustomLength ? ` (${customLengthInput})` : ''}]\n`;
+                finalScriptText += `Kategori: ${activeCategory}\n`; // FIX: Include Category
+                finalScriptText += `Rasio Video: ${videoRatio}\n`; // Include Ratio
+                finalScriptText += `Tujuan: ${goal}\n`;
+                finalScriptText += `Topik: ${mainConcept}\n`;
+                finalScriptText += `Target Audiens: ${audience || 'Umum'}\n\n`;
+                finalScriptText += "--------------------------------------------------------\n";
+                
+                const scenesData = [];
+                
+                for(let i = 0; i < sceneCount; i++) {
+                    // Menggunakan template secara berulang jika sceneCount > mockScenesTemplate.length
+                    const templateIndex = i % mockScenesTemplate.length; 
+                    const template = mockScenesTemplate[templateIndex];
+                    
+                    const scene = {
+                        id: i + 1,
+                        title: template.title.replace('Scene 1 (60s)', `Scene ${i+1}`), // Ganti judul bonus
+                        desc: template.desc.replace(/Produk X/g, mainConcept), // Mengganti Produk X dengan topik
+                        action: template.action.replace(/\$\{mainConcept\}/g, mainConcept),
+                        angle: template.angle,
+                        dialogue: template.dialogue ? template.dialogue.replace(/Produk X/g, mainConcept) : '', // Mengganti Produk X dengan topik
+                        imageUrl: null, // Initial: no image
+                        imageLoading: false, // Initial: not loading
+                    };
+                    scenesData.push(scene);
+                    
+                    // Build the full script text for reference (even if not displayed)
+                    finalScriptText += `SCENE ${scene.id}: ${scene.title.toUpperCase()}\n`;
+                    finalScriptText += `  - Visual/Deskripsi: ${scene.desc}\n`;
+                    finalScriptText += `  - Aksi Karakter: ${scene.action}\n`;
+                    finalScriptText += `  - Sudut/Enggel: ${scene.angle}\n`;
+                    if (scene.dialogue) { finalScriptText += `  - Dialog: "${scene.dialogue}"\n`; }
+                    finalScriptText += "--------------------------------------------------------\n";
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 1000)); 
+                
+                // Update state to show the text plan/structure is ready
+                setStoryScenes(scenesData);
+                setStoryOutput({ type: 'Visual Storyboard Script', content: finalScriptText.trim() });
+                setIsPlanReady(true);
+                setLoading(false);
+            };
+
+            // Helper function to call the image generation API
+            const generateSingleStoryVisual = async (scenePrompt, base64Data, mimeType) => {
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
+                
+                // --- Ratio Logic ---
+                let ratioInstruction = '';
+                let aspectRatioClass = '16:9'; // Default for landscape video
+                if (videoRatio === '9:16') {
+                    ratioInstruction = ', tall portrait shot, 9:16 aspect ratio, HIGHLY ENFORCED aspect ratio 9/16, such as 576x1024';
+                    aspectRatioClass = '9:16';
+                } else {
+                    ratioInstruction = ', wide cinematic shot, 16:9 aspect ratio, HIGHLY ENFORCED aspect ratio 16/9, such as 1024x576';
+                    aspectRatioClass = '16:9';
+                }
+                
+                // Prompt structure to enforce consistency and apply scene details
+                // FIX: Penguatan prompt untuk memastikan output gambar dan konsistensi visual
+                const activeCategory = isCustomCategory ? customCategory : category; // Gunakan kustom jika dipilih
+                
+                const finalPrompt = `Using the uploaded image as the primary reference for character, product, and style consistency, generate a photorealistic image that strictly adheres to this new scene direction: ${scenePrompt}. 
+                IMPORTANT: The visual elements (lighting, style, character) must match the source image. 
+                Ensure the aspect ratio is ${aspectRatioClass}. 
+                The scene must follow the genre/category of: ${activeCategory}.
+                High quality, cinematic shot, 8k, detailed, photorealistic. 
+                **DO NOT ADD ANY TEXT, LOGOS, WATERMARKS, or any form of writing in the final image.**
+                ${ratioInstruction}`;
+                
+                const parts = [{ text: finalPrompt }];
+                
+                // Add the image data to the request if available
+                if (base64Data && mimeType) {
+                    parts.push({ inlineData: { mimeType: mimeType, data: base64Data } });
+                }
+                
+                const payload = {
+                    contents: [{ parts: parts }],
+                    generationConfig: { responseModalities: ['IMAGE'] },
+                    safetySettings: [
+                        { "category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE" },
+                        { "category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE" },
+                        { "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE" },
+                        { "category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE" }
+                    ]
+                };
+                
+                let response;
+                try {
+                    // Penanganan backoff eksponensial (retry logic)
+                    const maxRetries = 3;
+                    for (let i = 0; i < maxRetries; i++) {
+                        response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                        if (response.ok || response.status !== 429) { // 429 is Too Many Requests
+                            break;
+                        }
+                        const delay = 1000 * Math.pow(2, i);
+                        await new Promise(res => setTimeout(res, delay));
+                    }
+
+                } catch (fetchError) {
+                    throw new Error(`Fetch Failed: ${fetchError.message}`);
+                }
+
+                if (!response || !response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`HTTP Error ${response?.status || 'Unknown'}: ${errorData?.error?.message || response?.statusText || 'Gagal koneksi'}`);
+                }
+
+                const result = await response.json();
+                
+                // Check for generated image data
+                const base64Image = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+                if (!base64Image) {
+                    let reason = "NO_IMAGE (Model failed to produce output).";
+                    if (result.promptFeedback && result.promptFeedback.blockReason) {
+                        reason = `BLOCKED: ${result.promptFeedback.blockReason}`;
+                    } else if (result?.candidates?.[0]?.finishReason && result?.candidates?.[0]?.finishReason !== "STOP") {
+                        reason = `FINISH REASON: ${result.candidates[0].finishReason}`;
+                    }
+                    throw new Error(reason);
+                }
+                return `data:image/png;base64,${base64Image}`;
+            };
+
+
+            // PHASE 2: Generate Visuals (Image Mockups)
+            const generateVisuals = async () => {
+                if (!storyScenes.length || loading) return;
+                if (!imageBase64) {
+                    alert("Harap unggah Gambar Referensi Awal terlebih dahulu untuk membuat visual yang konsisten.");
+                    return;
+                }
+
+                // Reset loading state for images
+                const scenesToLoad = storyScenes.map(scene => ({
+                    ...scene,
+                    imageLoading: true,
+                    imageUrl: null, // Reset image when starting new generation
+                }));
+                setLoading(true);
+
+                // Iterasi dan update state per scene
+                const totalScenes = scenesToLoad.length;
+                
+                for (let i = 0; i < totalScenes; i++) {
+                    const scene = { ...scenesToLoad[i] };
+                    
+                    scene.imageLoading = true;
+                    scenesToLoad[i] = scene;
+                    setStoryScenes([...scenesToLoad]); // Update UI to show individual scene loading
+
+                    try {
+                        const scenePrompt = `Scene ${scene.id}. Description: ${scene.desc}. Action: ${scene.action}. Camera Angle: ${scene.angle}. Dialogue: ${scene.dialogue || 'none'}. Topic: ${topic}.`;
+                        
+                        const imageUrl = await generateSingleStoryVisual(scenePrompt, imageBase64, imageMimeType);
+
+                        scene.imageUrl = imageUrl;
+                        scene.imageLoading = false;
+                        scenesToLoad[i] = scene;
+                        setStoryScenes([...scenesToLoad]);
+
+                    } catch (error) {
+                        console.error(`Gagal membuat visual untuk Scene ${scene.id}:`, error);
+                        
+                        // FIX: Menggunakan Base64 Red Solid (ERROR_RED_PLACEHOLDER)
+                        scene.imageUrl = ERROR_RED_PLACEHOLDER;
+                        scene.imageLoading = false;
+                        scenesToLoad[i] = scene;
+                        setStoryScenes([...scenesToLoad]);
+                    }
+                }
+                
+                setLoading(false);
+            };
+
+            const isGenerateDisabled = !topic.trim();
+            const isAnalyzeDisabled = !imageFile;
+            
+            // Mengambil kelas rasio aspek untuk kartu adegan
+            const sceneRatioClass = videoRatio === '9:16' ? 'aspect-9-16' : 'aspect-video';
+
+            // Component untuk me-render setiap adegan
+            const SceneCard = ({ scene }) => {
+                
+                // Periksa apakah URL gambar adalah Base64 error (merah solid)
+                const isErrorImage = scene.imageUrl === ERROR_RED_PLACEHOLDER; 
+                
+                const imageStatusContent = scene.imageLoading ? (
+                    <div className="flex flex-col items-center">
+                        <Icon name="Loader2" className="animate-spin text-indigo-400" size={30} />
+                        <p className="text-xs text-slate-400 mt-2">Membuat visual...</p>
+                    </div>
+                ) : (
+                    // Jika tidak loading
+                    <img 
+                        // FIX: Mengganti placeholder text dengan URL Base64 solid
+                        src={scene.imageUrl || DARK_GRAY_PLACEHOLDER}
+                        alt={`Visual Scene ${scene.id}`} 
+                        className={`w-full h-full object-cover ${!scene.imageUrl ? 'opacity-70' : ''}`}
+                        // Tambahkan indikator visual untuk error jika gambarnya merah solid
+                        style={isErrorImage ? { opacity: 1 } : {}} 
+                        onError={(e) => { 
+                             // Fallback: Jika ada masalah loading, gunakan Dark Gray Placeholder
+                             e.target.onerror = null; 
+                             e.target.src = DARK_GRAY_PLACEHOLDER; 
+                        }}
+                    />
+                );
+                
+                const handleDownloadScene = () => {
+                     if (scene.imageUrl && !scene.imageLoading && scene.imageUrl !== ERROR_RED_PLACEHOLDER) {
+                        const safeTitle = scene.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                        // Menggunakan fungsi downloadImage dari Vanilla JS
+                        downloadImage(scene.imageUrl, `MTC_Scene_${scene.id}_${safeTitle}.png`);
+                     } else if (isErrorImage) {
+                         alert("Gambar gagal di-generate dan tidak dapat diunduh.");
+                     }
+                };
+
+                const canDownload = !!scene.imageUrl && !scene.imageLoading && !isErrorImage;
+
+
+                return (
+                    <div className="card p-4 space-y-3">
+                        <h4 className="text-lg font-bold text-indigo-300">SCENE {scene.id}: {scene.title}</h4>
+                        
+                        {/* Menggunakan kelas rasio dinamis */}
+                        <div className={`w-full rounded-lg overflow-hidden bg-slate-900 border border-slate-700 flex items-center justify-center ${sceneRatioClass}`}>
+                            {imageStatusContent}
+                        </div>
+                        
+                        {/* Tombol Unduh di dalam Card */}
+                         <div className="flex justify-end">
+                            <button
+                                onClick={handleDownloadScene}
+                                disabled={!canDownload}
+                                className={`flex items-center text-sm font-semibold py-1.5 px-3 rounded-lg transition ${canDownload ? 'bg-cyan-600 hover:bg-cyan-700 text-white' : 'bg-slate-700 text-slate-400 cursor-not-allowed'}`}
+                            >
+                                <Icon name="Download" className="mr-2" size={16} /> Unduh Gambar
+                            </button>
+                        </div>
+                        
+                        <div className="text-xs text-slate-400 space-y-1 pt-2 border-t border-slate-800">
+                            <p className="font-semibold text-slate-300">Deskripsi: <span className="font-normal">{scene.desc}</span></p>
+                            <p className="font-semibold text-slate-300">Aksi: <span className="font-normal">{scene.action}</span></p>
+                            <p className="font-semibold text-slate-300">Angle: <span className="font-normal">{scene.angle}</span></p>
+                            {scene.dialogue && <p className="font-semibold text-slate-300">Dialog: <span className="font-normal italic">"{scene.dialogue}"</span></p>}
+                        </div>
+                    </div>
+                );
+            };
+
+            // Container untuk output Storyboard
+            const StoryboardOutput = () => {
+                const isLoadingVisuals = storyScenes.some(s => s.imageLoading);
+                const allVisualsLoaded = isPlanReady && storyScenes.every(s => s.imageUrl && !s.imageLoading);
+
+                // Placeholder Awal
+                if (!isPlanReady && !loading) {
+                    return (
+                         <div className="flex flex-col items-center justify-center h-full text-center py-10">
+                            <Icon name="ScrollText" className="text-slate-600 mb-3" size={48} />
+                            <p className="text-slate-400 italic font-semibold">
+                                Mulai dengan membuat Storyboard.
+                            </p>
+                            <p className="text-xs text-slate-500 mt-4">
+                                Hasil visual adegan akan muncul di sini setelah plan siap.
+                            </p>
+                        </div>
+                    );
+                }
+                
+                const handleDownloadPlan = () => {
+                    const planText = storyOutput?.content || "Gagal mendapatkan script.";
+                    const blob = new Blob([planText], { type: 'text/plain;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `Storyboard_Plan_${topic.replace(/\s/g, '_')}_${videoRatio}.txt`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                };
+
+
+                // Konten setelah Plan siap (isPlanReady = true)
+                return (
+                    <>
+                        {/* 1. Tombol Generate Visuals */}
+                        <h3 className="text-xl font-semibold text-slate-100 mb-4">Visual Storyboard Output:</h3>
+                        
+                        {isPlanReady && (
+                            <div className="mb-4 flex flex-col sm:flex-row gap-3">
+                                <GradientButton 
+                                    onClick={generateVisuals}
+                                    disabled={loading || allVisualsLoaded || !imageBase64} 
+                                    loading={isLoadingVisuals}
+                                    className="!py-2 !text-base !bg-gradient-to-r !from-fuchsia-500 !to-pink-600 !hover:from-fuchsia-600 !hover:to-pink-700 !shadow-fuchsia-500/30 sm:flex-grow"
+                                >
+                                    {isLoadingVisuals ? 'MEMBUAT VISUAL SCENE...' : allVisualsLoaded ? 'VISUAL SEMUA SCENE SIAP' : 'GENERATE SCENE VISUALS (Gambar Sesuai Input)'}
+                                </GradientButton>
+                                {/* Tombol Download */}
+                                <button
+                                    onClick={handleDownloadPlan}
+                                    disabled={!storyOutput}
+                                    className="btn-secondary py-2 px-4 rounded-lg flex items-center justify-center text-sm font-semibold sm:w-auto"
+                                >
+                                    <Icon name="Download" className="mr-2" size={16} /> Unduh Script/Plan
+                                </button>
+
+                                {!imageBase64 && isPlanReady && (
+                                    <p className="text-xs text-red-400 mt-2 text-center sm:w-full sm:mt-0">
+                                        *Unggah Gambar Referensi di Bagian Visual Referensi untuk mengaktifkan Generate Visuals.
+                                    </p>
+                                )}
+                            </div>
+                        )}
+
+                        {/* 2. Grid Storyboard (Visual Cards) */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {storyScenes.map(scene => (
+                                <SceneCard key={scene.id} scene={scene} />
+                            ))}
+                        </div>
+
+                        {/* --- 3. SCENARIO/SCRIPT DETAIL (DI BAWAH) --- */}
+                        {storyOutput && (
+                            <div className="mt-6 border-t border-slate-700 pt-4">
+                                <button 
+                                    onClick={() => setShowDetailedScript(!showDetailedScript)}
+                                    className="w-full bg-slate-800 text-slate-300 font-semibold py-2 px-4 rounded-lg flex items-center justify-between hover:bg-slate-700 transition"
+                                >
+                                    <span>{showDetailedScript ? '⬇️ Sembunyikan' : '⬆️ Tampilkan'} Script Visual & Arahan Kamera ({storyScenes.length} Scenes)</span>
+                                    <Icon name={"ScrollText"} />
+                                </button>
+                                {showDetailedScript && (
+                                    <div className="ugc-output-box text-slate-400 mt-3 max-h-96 overflow-y-auto border-indigo-500/50">
+                                        {storyOutput.content}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        {/* --- END SCRIPT DETAIL --- */}
+                    </>
+                );
+>>>>>>> parent of 875edcb (add apikey)
             }
 
             const payload = { contents: [{ parts: parts }] };
 
             try {
+<<<<<<< HEAD
                 const response = await fetch(url, {
+=======
+                // For mobile compatibility, we directly create an anchor tag with the data URI.
+                // This avoids using fetch/blob which can be unreliable on some mobile browsers.
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = imageUrl;
+                a.download = filename;
+                
+                // Append to body, click, and remove.
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } catch (error) {
+                console.error('Error downloading image:', error);
+                // Fallback for browsers that block programmatic downloads.
+                showModal('Gagal Mengunduh', `
+                    <p class="mb-4">Gagal mengunduh secara otomatis. Silakan <b>tekan dan tahan</b> gambar di bawah ini untuk menyimpannya.</p>
+                    <img src="${imageUrl}" class="w-full rounded-lg border">
+                `);
+            }
+        }
+
+        closeModalBtn.addEventListener('click', () => universalModal.classList.remove('visible'));
+        universalModal.addEventListener('click', (e) => {
+            if (e.target === universalModal) {
+                universalModal.classList.remove('visible');
+            }
+        });
+
+        // --- Tab 1: AI Product Photography (B-Roll) Logic ---
+        (function() {
+            const brollImageInput = document.getElementById('broll-image-input');
+            const brollImageUploadArea = document.getElementById('broll-image-upload-area');
+            const brollImagePreviewContainer = document.getElementById('broll-image-preview-container');
+            const brollImagePreviews = document.getElementById('broll-image-previews'); // Get the grid container
+            const brollRemoveAllBtn = document.getElementById('broll-remove-all-product-images-btn');
+            
+            const brollModelImageInput = document.getElementById('broll-model-image-input');
+            const brollModelImageUploadArea = document.getElementById('broll-model-image-upload-area');
+            const brollModelImagePreviewContainer = document.getElementById('broll-model-image-preview-container');
+            const brollModelImagePreview = document.getElementById('broll-model-image-preview');
+            const brollRemoveModelImageBtn = document.getElementById('broll-remove-model-image-btn');
+
+            const brollProductDescInput = document.getElementById('broll-product-desc-input');
+            const brollGenerateBtn = document.getElementById('broll-generate-btn');
+            const brollGrid = document.getElementById('broll-b-roll-grid');
+            const brollGenerateDescBtn = document.getElementById('broll-generate-desc-btn');
+
+            function updateBrollButtonState() {
+                const hasProducts = brollProductImages.length > 0;
+                brollGenerateBtn.disabled = !hasProducts || !brollProductDescInput.value.trim();
+                brollGenerateDescBtn.disabled = !hasProducts;
+                brollRemoveAllBtn.disabled = !hasProducts;
+            }
+            
+            brollImageInput.addEventListener('change', (event) => {
+                handleBrollProductFiles(event.target.files);
+                event.target.value = null;
+            });
+
+            function manageAddMoreButton() {
+                const existingButton = document.getElementById('broll-add-more-button');
+                if (existingButton) {
+                    existingButton.remove();
+                }
+
+                const addButtonWrapper = document.createElement('div');
+                addButtonWrapper.id = 'broll-add-more-button';
+                addButtonWrapper.innerHTML = `
+                    <label for="broll-image-input" class="w-full h-24 flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-600 cursor-pointer text-gray-400 hover:bg-gray-700 hover:border-cyan-400 transition-colors">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    </label>
+                `;
+                brollImagePreviews.appendChild(addButtonWrapper);
+            }
+            
+            function handleBrollProductFiles(files) {
+                if (files.length === 0) {
+                     // Jika tidak ada file baru, hanya pastikan tombol 'add more' ada
+                    if (brollProductImages.length > 0) {
+                        manageAddMoreButton();
+                    }
+                    return;
+                }
+
+                brollImageUploadArea.classList.add('hidden');
+                brollImagePreviewContainer.classList.remove('hidden');
+                // Hapus tombol 'add more' sementara
+                const addButton = document.getElementById('broll-add-more-button');
+                if (addButton) addButton.remove();
+
+                let filesToProcess = files.length;
+                
+                Array.from(files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const parts = e.target.result.split(',');
+                        const mimeType = parts[0].match(/:(.*?);/)[1];
+                        const base64 = parts[1];
+                        const imageData = { base64, mimeType, id: Date.now() + Math.random() };
+                        brollProductImages.push(imageData);
+
+                        const previewWrapper = document.createElement('div');
+                        previewWrapper.className = 'relative group';
+                        previewWrapper.innerHTML = `
+                            <img src="${e.target.result}" alt="Pratinjau Produk" class="rounded-lg w-full h-24 object-cover">
+                            <button data-id="${imageData.id}" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100">
+                                <svg xmlns="http://www.w3.org/2300/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        `;
+                        
+                        brollImagePreviews.appendChild(previewWrapper); // Gunakan brollImagePreviews
+                        
+                        previewWrapper.querySelector('button').addEventListener('click', (btnEvent) => {
+                            const idToRemove = parseFloat(btnEvent.currentTarget.getAttribute('data-id'));
+                            brollProductImages = brollProductImages.filter(img => img.id !== idToRemove);
+                            previewWrapper.remove();
+                            
+                            // Periksa ulang setelah menghapus
+                            if (brollProductImages.length === 0) {
+                                brollImageUploadArea.classList.remove('hidden');
+                                brollImagePreviewContainer.classList.add('hidden');
+                            } else {
+                                manageAddMoreButton();
+                            }
+                            updateBrollButtonState();
+                        });
+
+                        updateBrollButtonState();
+                        
+                        filesToProcess--;
+                        if (filesToProcess === 0) {
+                            manageAddMoreButton();
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            brollRemoveAllBtn.addEventListener('click', () => {
+                brollProductImages = [];
+                brollImagePreviews.innerHTML = ''; // Hapus semua pratinjau
+                
+                brollImageUploadArea.classList.remove('hidden');
+                brollImagePreviewContainer.classList.add('hidden');
+                brollImageInput.value = null; // Clear file input
+                
+                updateBrollButtonState();
+            });
+
+
+            function setupBrollSingleImageUpload(input, uploadArea, previewContainer, previewImg, removeBtn, onUpload) {
+                input.addEventListener('change', (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            previewImg.src = e.target.result;
+                            const parts = e.target.result.split(',');
+                            const mimeType = parts[0].match(/:(.*?);/)[1];
+                            const base64 = parts[1];
+                            // FIX: Menggunakan mimeType sebagai argumen
+                            onUpload(base64, mimeType);
+                            
+                            uploadArea.classList.add('hidden');
+                            previewContainer.classList.remove('hidden');
+                            removeBtn.classList.remove('hidden'); // Tampilkan tombol hapus
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                         // Jika file dibatalkan/dihapus, bersihkan
+                        onUpload(null, null);
+                        input.value = '';
+                        uploadArea.classList.remove('hidden');
+                        previewContainer.classList.add('hidden');
+                        removeBtn.classList.add('hidden'); 
+                    }
+                });
+
+                removeBtn.addEventListener('click', () => {
+                    onUpload(null, null);
+                    input.value = '';
+                    uploadArea.classList.remove('hidden');
+                    previewContainer.classList.add('hidden');
+                    removeBtn.classList.add('hidden');
+                });
+            }
+            
+            setupBrollSingleImageUpload(brollModelImageInput, brollModelImageUploadArea, brollModelImagePreviewContainer, brollModelImagePreview, brollRemoveModelImageBtn, (base64, mimeType) => {
+                brollModelImageBase64 = base64;
+                brollModelImageMimeType = mimeType;
+            });
+
+            brollProductDescInput.addEventListener('input', updateBrollButtonState);
+
+            const createInitialBrollPlaceholders = () => {
+                brollGrid.innerHTML = '';
+                const orientation = document.querySelector('input[name="broll-orientation"]:checked')?.value || 'horizontal';
+                // FIX: Menggunakan 'aspect-video' (16/9) atau custom 'aspect-9-16' (9/16)
+                const aspectRatioClass = orientation === 'vertical' ? 'aspect-9-16' : 'aspect-video'; 
+                for(let i = 1; i <= 21; i++) {
+                    const card = document.createElement('div');
+                    card.className = 'result-card card p-4 flex flex-col justify-between animate-pulse';
+                    card.innerHTML = `
+                        <div><div class="h-6 bg-gray-600 rounded w-3/4 mb-4"></div></div>
+                        <div class="mt-4 ${aspectRatioClass} bg-gray-700 rounded-md flex items-center justify-center"></div>
+                    `;
+                    brollGrid.appendChild(card);
+                }
+            };
+            window.addEventListener('load', createInitialBrollPlaceholders);
+            document.querySelectorAll('input[name="broll-orientation"]').forEach(radio => {
+                radio.addEventListener('change', createInitialBrollPlaceholders);
+            });
+            
+            brollGenerateBtn.addEventListener('click', async () => {
+                if (brollProductImages.length === 0) return;
+                brollGenerateBtn.disabled = true;
+                brollGenerateBtn.innerHTML = `<div class="loader"></div><span class="ml-2">Menganalisa...</span>`;
+                brollGrid.innerHTML = `<div class="col-span-1 sm:col-span-2 xl:col-span-3 text-center py-10">
+                    <div class="loader inline-block"></div>
+                    <p class="mt-4 text-gray-400">AI sedang menganalisis produk dan membuat ide pose...</p>
+                </div>`;
+
+                try {
+                    const brollIdeas = await analyzeAndGetPrompts();
+                    brollGenerateBtn.innerHTML = `<div class="loader"></div><span class="ml-2">Membuat Visual...</span>`;
+                    createBrollDynamicCards(brollIdeas);
+                    
+                    const generationPromises = brollIdeas.map((idea, index) => 
+                        generateSingleBroll(index + 1, idea.title, idea.prompt)
+                    );
+                    await Promise.allSettled(generationPromises);
+                } catch (error) {
+                    console.error("Error during generation process:", error);
+                    brollGrid.innerHTML = `<div class="col-span-1 sm:col-span-2 xl:col-span-3 text-center py-10 text-red-400">
+                        <p>Terjadi kesalahan saat menganalisis produk: ${error.message}</p>
+                    </div>`;
+                } finally {
+                    brollGenerateBtn.disabled = false;
+                    brollGenerateBtn.innerHTML = `<span>Buat 21 Pose Produk</span>`;
+                }
+            });
+
+            async function analyzeAndGetPrompts() {
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                const orientation = document.querySelector('input[name="broll-orientation"]:checked').value;
+                
+                let systemPrompt = '';
+                if (brollModelImageBase64) {
+                     systemPrompt = `You are an expert AI photo director. Your task is to analyze product images/description and generate 21 distinct shot ideas for a specified orientation: ${orientation}$. You may also be given a model's photo and a theme to incorporate. If multiple product images are provided (e.g., a shirt and pants), generate prompts that show a model wearing the complete outfit. For each shot, provide a short title (in Indonesian) and a CONCISE English prompt for an AI image generator. The prompt should focus on essential cinematic elements (lighting, composition, mood) to create a high-quality ${orientation} photo while keeping the prompt length efficient. Respond ONLY with a valid JSON array of 21 objects.`;
+                } else {
+                     systemPrompt = `You are an elite-level creative director specializing in high-end product photography. Your primary goal is to generate 21 sophisticated, modern, and elegant photoshoot concepts that are directly relevant to the product provided. First, thoroughly analyze the product image and its description to understand its category, purpose, and ideal customer. Then, based on this analysis, generate 21 unique concepts. **Absolutely no people, models, or human parts should be in the final image.** The concepts must be diverse yet consistently professional. For example, suggest setups like: the product on a polished marble slab with soft shadows, minimalist compositions with geometric shapes, scenes with clean water splashes or ripples, atmospheric shots with subtle smoke or fog, or studio setups with architectural elements and focused lighting. Avoid random or bizarre settings; every theme must feel intentional and elevate the product's appeal. For each concept, provide a short, elegant title in Indonesian and a CONCISE English prompt for the AI image generator. Respond ONLY with a valid JSON array of 21 objects.`;
+                }
+
+                const theme = document.getElementById('broll-photo-theme-input').value.trim();
+                let userQuery = `Analyze this product. Product Description: "${brollProductDescInput.value.trim()}". Desired orientation is ${orientation}.`;
+                if (theme) {
+                    userQuery += `\nPhoto Theme: "${theme}"`;
+                }
+                const parts = [{ text: userQuery }];
+                brollProductImages.forEach(img => {
+                    parts.push({ inlineData: { mimeType: img.mimeType, data: img.base64 } });
+                });
+                if (brollModelImageBase64) {
+                    parts.push({ inlineData: { mimeType: brollModelImageMimeType, data: brollModelImageBase64 } });
+                }
+                const payload = { contents: [{ parts: parts }], systemInstruction: { parts: [{ text: systemPrompt }] }, generationConfig: { responseMimeType: "application/json", responseSchema: { type: "ARRAY", items: { type: "OBJECT", properties: { "title": { "type": "STRING" }, "prompt": { "type": "STRING" } }, required: ["title", "prompt"] } } } };
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`); }
+                const result = await response.json();
+                
+                if (!result.candidates || !result.candidates[0].content || !result.candidates[0].content.parts || !result.candidates[0].content.parts[0].text) {
+                    throw new Error("Invalid response structure from API.");
+                }
+
+                let rawText = result.candidates[0].content.parts[0].text;
+                rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+                const startIndex = rawText.indexOf('[');
+                const endIndex = rawText.lastIndexOf(']');
+
+                if (startIndex === -1 || endIndex === -1 || startIndex > endIndex) {
+                    throw new Error("Could not find a valid JSON array in the API response.");
+                }
+                
+                const jsonText = rawText.substring(startIndex, endIndex + 1);
+
+                try {
+                    return JSON.parse(jsonText);
+                } catch (e) {
+                    console.error("Failed to parse JSON:", jsonText, e);
+                    throw new Error("API returned malformed JSON after cleaning.");
+                }
+            }
+
+            async function generateSingleBroll(id, title, prompt) {
+                const card = document.getElementById(`broll-card-${id}`);
+                if (!card) return;
+                const outputContainer = card.querySelector('.broll-output-container');
+                
+                const retries = 3;
+                let lastError = null;
+                const orientation = document.querySelector('input[name="broll-orientation"]:checked').value;
+                
+                // --- Kunci perbaikan: Gunakan instruksi rasio yang lebih kuat di prompt ---
+                let ratioInstruction = '';
+                if (orientation === 'horizontal') {
+                    // Gunakan rasio 16:9 yang eksplisit dan instruksi dimensi
+                    ratioInstruction = ', wide cinematic shot, 16:9 aspect ratio, HIGHLY ENFORCED aspect ratio 16/9, such as 1024x576'; 
+                } else if (orientation === 'vertical') {
+                    // Gunakan rasio 9:16 yang eksplisit dan instruksi dimensi
+                    ratioInstruction = ', tall portrait shot, 9:16 aspect ratio, HIGHLY ENFORCED aspect ratio 9/16, such as 576x1024'; 
+                }
+
+                for (let i = 0; i < retries; i++) {
+                    try {
+                        const apiKey = "";
+                        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
+                        
+                        let finalPrompt = '';
+                        if (brollModelImageBase64) {
+                            finalPrompt = `${prompt}, ${orientation} orientation, elegant, cinematic, professional product photography, dramatic lighting, 8k, photorealistic${ratioInstruction}`;
+                        } else {
+                            finalPrompt = `${prompt}, professional commercial product photography, hyper-detailed, epic composition, cinematic lighting, no people, ${orientation} orientation, 8k, photorealistic${ratioInstruction}`;
+                        }
+                        
+                        const parts = [{ text: finalPrompt }];
+                        
+                        brollProductImages.forEach(img => {
+                            parts.push({ inlineData: { mimeType: img.mimeType, data: img.base64 } });
+                        });
+
+                        if (brollModelImageBase64) { parts.push({ inlineData: { mimeType: brollModelImageMimeType, data: brollModelImageBase64 } }); }
+                        
+                        const payload = {
+                            contents: [{ parts: parts }],
+                            generationConfig: { responseModalities: ['IMAGE'] },
+                            safetySettings: [
+                                { "category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE" },
+                                { "category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE" },
+                                { "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE" },
+                                { "category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE" }
+                            ]
+                        };
+                        
+                        const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                        
+                        let result = {};
+                        try {
+                            // Coba untuk mem-parsing respons JSON
+                            result = await response.json();
+                        } catch (e) {
+                            // Jika parsing gagal (misalnya respons kosong), kita akan menganggapnya sebagai hasil yang diblokir
+                            console.warn("Gagal parsing respons JSON, mungkin body kosong atau malformed.", e);
+                        }
+                        
+                        // Periksa kesalahan HTTP
+                        if (!response.ok) {
+                             const errorMessage = result.error?.message || `HTTP error! status: ${response.status}`; 
+                             throw new Error(errorMessage); 
+                        }
+
+                        // Check for generated image data
+                        const base64Data = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+                        
+                        if (base64Data) {
+                            const imageUrl = `data:image/png;base64,${base64Data}`;
+                            const safeTitle = title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                            outputContainer.innerHTML = `
+                                <div class="relative w-full h-full group">
+                                    <img src="${imageUrl}" class="w-full h-full object-cover rounded-md" alt="${title}">
+                                    <div class="absolute bottom-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        <button onclick="handleVideoPromptClick('${imageUrl}', '${title}')" class="bg-fuchsia-500 text-white p-2 rounded-full hover:bg-fuchsia-600" title="✨ Buat Prompt Video">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm3 2h6v4H7V5zm8 8H5v-2h10v2z" clip-rule="evenodd" /></svg>
+                                        </button>
+                                        <button onclick="handleCaptionClick('${imageUrl}', '${title}')" class="bg-rose-500 text-white p-2 rounded-full hover:bg-rose-600" title="✨ Buat Caption">
+                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
+                                        </button>
+                                        <button onclick="downloadImage('${imageUrl}', 'MTC_${id}_${safeTitle}.png')" class="bg-cyan-600 text-white p-2 rounded-full hover:bg-cyan-700" title="Unduh Gambar">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                                        </button>
+                                    </div>
+                                </div>`;
+                            return;
+                        } else {
+                             // Jika tidak ada data gambar, periksa alasan blokir
+                             let reason = "Respon OK tetapi gambar tidak ditemukan.";
+                            if (result.promptFeedback && result.promptFeedback.blockReason) {
+                                reason = `Diblokir: ${result.promptFeedback.blockReason}`;
+                            } else if (result?.candidates?.[0]?.finishReason) {
+                                reason = `Selesai dengan alasan: ${result.candidates[0].finishReason}`;
+                            }
+                            throw new Error(reason);
+                        }
+                    } catch (error) {
+                        lastError = error;
+                        console.error(`Attempt ${i + 1} for card ${id} failed:`, error);
+                        if (i < retries - 1) {
+                            const delay = 1000 * Math.pow(2, i);
+                            await new Promise(res => setTimeout(res, delay));
+                        }
+                    }
+                }
+
+                if (lastError) {
+                    console.error(`All retries failed for card ${id}:`, lastError);
+                    outputContainer.innerHTML = `<div class="text-xs text-red-400 p-2 text-center" title="${lastError.message}">Gagal: ${lastError.message.substring(0, 50)}${lastError.message.length > 50 ? '...' : ''}</div>`;
+                }
+            }
+            
+            const createBrollDynamicCards = (prompts) => {
+                brollGrid.innerHTML = '';
+                const orientation = document.querySelector('input[name="broll-orientation"]:checked').value;
+                // FIX: Menggunakan 'aspect-video' (16/9) atau custom 'aspect-9-16' (9/16)
+                const aspectRatioClass = orientation === 'vertical' ? 'aspect-9-16' : 'aspect-video'; 
+                prompts.forEach((p, index) => {
+                    const card = document.createElement('div');
+                    card.id = `broll-card-${index + 1}`;
+                    card.className = 'result-card card p-4 flex flex-col justify-between';
+                    card.innerHTML = `<div><h3 class="text-lg font-semibold text-gray-100 mb-4">${p.title}</h3></div> <div class="broll-output-container ${aspectRatioClass} bg-gray-700 rounded-md flex items-center justify-center"><div class="loader"></div></div>`;
+                    brollGrid.appendChild(card);
+                });
+            };
+
+            brollGenerateDescBtn.addEventListener('click', async () => {
+                const originalButtonText = brollGenerateDescBtn.innerHTML;
+                brollGenerateDescBtn.innerHTML = `<div class="loader !w-4 !h-4 !border-2"></div>`;
+                brollGenerateDescBtn.disabled = true;
+                try {
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                    const systemPrompt = `You are a professional copywriter. Analyze the product in the image and write a concise, compelling, and SEO-friendly product description in Indonesian. Highlight its key features and potential benefits for customers. Keep it under 500 characters.`;
+                    const userQuery = `Buatkan deskripsi produk untuk gambar ini.`;
+                    const parts = [ { text: userQuery }];
+                    if (brollProductImages.length > 0) {
+                         parts.push({ inlineData: { mimeType: brollProductImages[0].mimeType, data: brollProductImages[0].base64 } });
+                    }
+                    const payload = {
+                        contents: [{ parts: parts }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] }
+                    };
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`); }
+                    const result = await response.json();
+                    const description = result.candidates[0].content.parts[0].text;
+                    brollProductDescInput.value = description.trim();
+                    updateBrollButtonState();
+                } catch(error) {
+                    console.error("Error generating description:", error);
+                    brollProductDescInput.value = "Gagal membuat deskripsi. Coba lagi.";
+                } finally {
+                    brollGenerateDescBtn.innerHTML = originalButtonText;
+                    brollGenerateDescBtn.disabled = false;
+                }
+            });
+
+            window.handleCaptionClick = async function(imageUrl, title) {
+                showModal('✨ Caption Media Sosial', `<div class="flex flex-col items-center gap-4"><div class="loader"></div> <p class="text-gray-400">AI sedang meracik caption...</p></div>`);
+                try {
+                    const parts = imageUrl.split(',');
+                    const mimeType = parts[0].match(/:(.*?);/)[1];
+                    const base64Data = parts[1];
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                    const systemPrompt = `You are a creative social media manager. Based on the product photo, description, and theme, write an engaging Instagram caption in Indonesian. It should be appealing, concise, and end with 3-5 relevant hashtags.`;
+                    const userQuery = `Product Description: "${brollProductDescInput.value.trim()}"\nPhoto Theme: "${title}"`;
+                    const payload = {
+                        contents: [{ parts: [ { text: userQuery }, { inlineData: { mimeType: mimeType, data: base64Data } } ] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] }
+                    };
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`); }
+                    const result = await response.json();
+                    const caption = result.candidates[0].content.parts[0].text;
+                    const content = `
+                        <div id="modal-text-content" class="whitespace-pre-wrap bg-gray-700 p-4 rounded-lg text-gray-300 mb-4">${caption.trim()}</div>
+                        <button id="copy-modal-btn" class="w-full btn-primary font-bold py-2 px-4 rounded-lg flex items-center justify-center">Salin Caption</button>
+                    `;
+                    showModal('✨ Caption Media Sosial', content);
+                    document.getElementById('copy-modal-btn').addEventListener('click', (e) => {
+                        const text = document.getElementById('modal-text-content').innerText;
+                        copyToClipboard(text, e.currentTarget);
+                    });
+                } catch (error) {
+                    console.error("Error generating caption:", error);
+                    showModal('Error', `<p class="text-red-400">Gagal membuat caption. Silakan coba lagi.</p>`);
+                }
+            }
+
+            window.handleVideoPromptClick = async function(imageUrl, title) {
+                showModal('✨ Prompt Image-to-Video', `<div class="flex flex-col items-center gap-4"><div class="loader"></div> <p class="text-gray-400">AI sedang menganalisa gerakan...</p></div>`);
+                try {
+                    const parts = imageUrl.split(',');
+                    const mimeType = parts[0].match(/:(.*?);/)[1];
+                    const base64Data = parts[1];
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
+                    const systemPrompt = `You are an AI video generation expert. Based on the provided image, its theme, and the product description, generate a concise image-to-video prompt in English. The prompt must strictly follow the formula: "subject + what it's doing (action) + background + camera movement)". Infer the most logical and visually appealing motion from the static image for the 'action' part, such as walking, turning, or posing on a catwalk. Then, add a suitable 'camera movement' to make the shot more cinematic (e.g., 'slow zoom in', 'panning from left to right', 'dolly shot forward'). Be creative and focus on creating a dynamic, cinematic shot suitable for a fashion showcase.`;
+                    const userQuery = `Product Description: "${brollProductDescInput.value.trim()}"\nPhoto Theme: "${title}"`;
+                    const payload = {
+                        contents: [{ parts: [ { text: userQuery }, { inlineData: { mimeType: mimeType, data: base64Data } } ] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] }
+                    };
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`); }
+                    const result = await response.json();
+                    const prompt = result.candidates[0].content.parts[0].text;
+                    const content = `
+                        <div id="modal-text-content" class="whitespace-pre-wrap bg-gray-700 p-4 rounded-lg text-gray-300 mb-4 font-mono">${prompt.trim()}</div>
+                        <button id="copy-modal-btn" class="w-full btn-primary font-bold py-2 px-4 rounded-lg flex items-center justify-center">Salin Prompt</button>
+                    `;
+                    showModal('✨ Prompt Image-to-Video', content);
+                    document.getElementById('copy-modal-btn').addEventListener('click', (e) => {
+                        const text = document.getElementById('modal-text-content').innerText;
+                        copyToClipboard(text, e.currentTarget);
+                    });
+                } catch (error) {
+                    console.error("Error generating video prompt:", error);
+                    showModal('Error', `<p class="text-red-400">Gagal membuat prompt video. Silakan coba lagi.</p>`);
+                }
+            }
+        })();
+
+
+        // --- Tab 2: Pose Fashion Logic ---
+        (function() {
+            const posesUploadArea = document.getElementById('poses-uploadArea');
+            const posesImageUpload = document.getElementById('poses-imageUpload');
+            const posesPreviewContainer = document.getElementById('poses-previewContainer');
+            const posesImagePreview = document.getElementById('poses-imagePreview');
+            const posesFileName = document.getElementById('poses-fileName');
+            const posesSelectPoseBtn = document.getElementById('poses-selectPoseBtn');
+            const posesGenerateBtn = document.getElementById('poses-generateBtn');
+            const posesResultsContainer = document.getElementById('poses-resultsContainer');
+            const posesResultsGrid = document.getElementById('poses-resultsGrid');
+            const posesErrorContainer = document.getElementById('poses-errorContainer');
+            const posesErrorMessage = document.getElementById('poses-errorMessage');
+            const posesPoseModal = document.getElementById('poses-poseModal');
+            const posesCancelModalBtn = document.getElementById('poses-cancelModalBtn');
+            const posesPoseListContainer = document.getElementById('poses-poseListContainer');
+            const posesSelectionCounter = document.getElementById('poses-selectionCounter');
+            // NEW: Tombol Hapus Preview Pose
+            const posesRemoveImageBtn = document.getElementById('poses-remove-image-btn'); 
+
+
+            const ALL_POSES = [
+                'Pose fashion dinamis dengan satu tangan di pinggul dan tangan lainnya diangkat ke atas', 'Pose klasik dengan tangan di saku celana', 'Menyender ke dinding dengan santai, satu kaki ditekuk', 'Pose fashion dinamis membentuk huruf S dengan tubuh', 'Berdiri tegak dengan tatapan kuat, tangan menyilang di dada', 'Pose contrapposto, berat badan pada satu kaki, pinggul miring', 'Berdiri dengan kaki terbuka lebar, pose yang kuat dan percaya diri', 'Pose dari belakang (standing backpose), menoleh sedikit ke kamera', 'Pose dari samping (side profile), menatap lurus ke depan', 'Satu tangan di pinggul, tangan lain memegang kerah baju atau aksesori', 'Pose asimetris, satu bahu lebih tinggi dari yang lain', 'Pose minimalis, berdiri lurus menatap kamera dengan ekspresi netral', 'Pose berjalan, seolah-olah tertangkap kamera sedang melangkah', 'Pose melompat kecil dengan ekspresi ceria', 'Pose berputar (spinning), dengan gaun atau rambut yang bergerak', 'Pose berlari kecil dengan gaya candid', 'Duduk di kursi dengan elegan, satu kaki menyilang di atas yang lain', 'Duduk di lantai dengan santai, satu lutut ditekuk ke atas', 'Duduk di tangga, menatap ke arah atas atau bawah', 'Duduk di lantai dengan kaki lurus ke depan, menonjolkan sepatu', 'Beauty shot close-up, fokus pada wajah dan riasan, dengan senyuman lembut', 'Tangan membingkai wajah atau menyentuh rambut dengan lembut', 'Pose half-body yang elegan, satu tangan diangkat ke dekat dagu', 'Menatap tajam ke kamera dengan ekspresi serius (fierce)', 'Tertawa lepas, candid close-up', 'Satu tangan di bahu, tubuh sedikit miring ke samping', 'Melihat ke belakang lewat bahu (over-the-shoulder)', 'Pose dramatis dengan permainan bayangan yang kuat pada wajah atau tubuh', 'Berinteraksi dengan properti (misal: memegang topi, kacamata, atau tas)', 'Pose berbaring di lantai atau sofa dengan gaya high fashion',
+            ];
+
+            function initializePosesList() {
+                posesPoseListContainer.innerHTML = '';
+                ALL_POSES.forEach(pose => {
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors';
+                    div.innerHTML = `
+                        <input type="checkbox" id="${pose.replace(/\s/g, '-')}" value="${pose}" class="w-5 h-5 bg-gray-600 border-gray-500 rounded text-cyan-600 focus:ring-cyan-600 cursor-pointer">
+                        <label for="${pose.replace(/\s/g, '-')}" class="ml-3 text-gray-300 cursor-pointer">${pose}</label>
+                    `;
+                    posesPoseListContainer.appendChild(div);
+                });
+                posesPoseListContainer.addEventListener('change', updatePosesSelectionCount);
+            }
+            function updatePosesSelectionCount() {
+                const checkedBoxes = posesPoseListContainer.querySelectorAll('input[type="checkbox"]:checked');
+                const count = checkedBoxes.length;
+                posesSelectionCounter.textContent = count;
+                posesGenerateBtn.disabled = count === 0;
+                const allBoxes = posesPoseListContainer.querySelectorAll('input[type="checkbox"]');
+                if (count >= 21) {
+                    allBoxes.forEach(box => { if (!box.checked) { box.disabled = true; } });
+                } else {
+                    allBoxes.forEach(box => { box.disabled = false; });
+                }
+            }
+            function posesShowError(message) {
+                posesErrorMessage.textContent = message;
+                posesErrorContainer.classList.remove('hidden');
+            }
+            function posesHideError() {
+                posesErrorContainer.classList.add('hidden');
+            }
+            
+            function hidePosesPreview() {
+                posesUploadedFileAsDataUrl = null;
+                posesImageUpload.value = null;
+                posesPreviewContainer.classList.add('hidden');
+                posesUploadArea.classList.remove('hidden');
+                posesSelectPoseBtn.disabled = true;
+                posesResultsContainer.classList.add('hidden');
+                posesResultsGrid.innerHTML = '';
+            }
+
+            function handlePosesFileSelect(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    posesHideError();
+                    posesResultsContainer.classList.add('hidden');
+                    posesResultsGrid.innerHTML = '';
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        posesUploadedFileAsDataUrl = event.target.result;
+                        posesImagePreview.src = posesUploadedFileAsDataUrl;
+                    };
+                    reader.readAsDataURL(file);
+                    posesFileName.textContent = file.name;
+                    posesPreviewContainer.classList.remove('hidden');
+                    posesUploadArea.classList.add('hidden'); // Sembunyikan area unggah utama
+                    posesSelectPoseBtn.disabled = false;
+                }
+            }
+            async function runPosesGeneration() {
+                if (!posesUploadedFileAsDataUrl) { posesShowError("Silakan unggah gambar terlebih dahulu."); return; }
+                const selectedPoses = Array.from(posesPoseListContainer.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+                if (selectedPoses.length === 0) { posesShowError("Pilih setidaknya satu pose."); return; }
+                posesPoseModal.classList.add('hidden');
+                posesSelectPoseBtn.disabled = true;
+                posesGenerateBtn.disabled = true;
+                posesHideError();
+                posesPreviewContainer.classList.add('hidden');
+                posesResultsContainer.classList.remove('hidden');
+                posesResultsContainer.querySelector('h2').textContent = "AI sedang bekerja, mohon tunggu...";
+                posesResultsGrid.innerHTML = '';
+                const base64Data = posesUploadedFileAsDataUrl.split(',')[1];
+                const mimeType = posesUploadedFileAsDataUrl.split(',')[0].split(':')[1].split(';')[0];
+                selectedPoses.forEach((pose, index) => {
+                    const card = createPosesCard(`poses-loader-${index}`, pose);
+                    card.innerHTML = `<div class="w-full aspect-[3/4] flex items-center justify-center bg-gray-900/50"><div class="loader card-loader"></div></div><div class="p-3 text-center"><p class="text-sm text-gray-400">Membuat pose...</p></div>`;
+                    posesResultsGrid.appendChild(card);
+                });
+                for (let i = 0; i < selectedPoses.length; i++) {
+                    const poseText = selectedPoses[i];
+                    try {
+                        const generatedImageBase64 = await generatePosesImageWithNanoBanana(base64Data, mimeType, poseText);
+                        const imageUrl = `data:image/png;base64,${generatedImageBase64}`;
+                        updatePosesCardWithResult(`poses-loader-${i}`, imageUrl, poseText);
+                    } catch (err) {
+                        console.error(`Gagal membuat pose "${poseText}":`, err);
+                        updatePosesCardWithError(`poses-loader-${i}`, poseText, err.message);
+                    }
+                }
+                posesResultsContainer.querySelector('h2').textContent = "Hasil Pose Telah Siap!";
+                posesSelectPoseBtn.disabled = false;
+            }
+            async function generatePosesImageWithNanoBanana(base64ImageData, mimeType, prompt) {
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
+                const payload = {
+                    contents: [{
+                        parts: [
+                            { text: `Dari gambar yang diberikan, ubah pose model sesuai instruksi berikut: '${prompt}'. Penting: Jangan ubah pakaian, latar belakang, atau tema foto asli. Pertahankan semuanya tetap sama persis, hanya ubah pose model dan mungkin sedikit sudut pandang kamera untuk menyesuaikan.` },
+                            { inlineData: { mimeType: mimeType, data: base64ImageData } }
+                        ]
+                    }],
+                    generationConfig: { responseModalities: ['IMAGE'] },
+                    safetySettings: [
+                        { "category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE" }, { "category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE" }, { "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE" }, { "category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE" }
+                    ]
+                };
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) {
+                    const errorBody = await response.json();
+                    throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorBody.error.message}`);
+                }
+                const result = await response.json();
+                if (!result.candidates || result.candidates.length === 0) {
+                    if (result.promptFeedback && result.promptFeedback.blockReason) { throw new Error(`Generasi diblokir: ${result.promptFeedback.blockReason}.`); }
+                    throw new Error("API tidak memberikan hasil. Respons kosong.");
+                }
+                const candidate = result.candidates[0];
+                const base64Data = candidate.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+                if (!base64Data) {
+                    if (candidate.finishReason && candidate.finishReason !== "STOP") { throw new Error(`Generasi gagal: ${candidate.finishReason}.`); }
+                    throw new Error("Tidak ada data gambar yang diterima dari API.");
+                }
+                return base64Data;
+            }
+            function createPosesCard(id, poseText) {
+                const card = document.createElement('div');
+                card.id = id;
+                card.className = "bg-gray-900/50 rounded-lg overflow-hidden border border-gray-600 transition-all";
+                card.setAttribute('data-pose', poseText);
+                return card;
+            }
+            function updatePosesCardWithResult(cardId, imageUrl, poseText) {
+                const card = document.getElementById(cardId);
+                if (!card) return;
+                card.innerHTML = `<img src="${imageUrl}" alt="Generated ${poseText}" class="w-full h-auto object-cover aspect-[3/4]"><div class="p-3 text-center"><button onclick="downloadImage('${imageUrl}', '${poseText.replace(/\s/g, '_')}.png')" class="inline-flex items-center btn-primary text-sm font-semibold py-2 px-4 rounded-md"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>Unduh</button></div>`;
+            }
+            function updatePosesCardWithError(cardId, poseText, errorMessage) {
+                const card = document.getElementById(cardId);
+                if (!card) return;
+                card.classList.remove('border-gray-300');
+                card.classList.add('border-red-500');
+                card.innerHTML = `<div class="w-full aspect-[3/4] flex flex-col items-center justify-center bg-red-900/30 text-red-400 p-4"><svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-triangle"><path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><p class="text-sm font-semibold text-center">Gagal Membuat Pose</p><p class="text-xs text-center text-red-400" title="${errorMessage}">${poseText}</p></div><div class="p-3 text-center"><button onclick="retryPosesGenerationForCard('${cardId}', \`${poseText}\`)" class="inline-flex items-center bg-yellow-400 text-gray-800 text-sm font-semibold py-2 px-4 rounded-md hover:bg-yellow-500 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rotate-cw"><path d="M21 2v6h-6"/><path d="M2.3 12a9 9 0 1 0 2.2-7.24L2.3 6"/></svg>Ulangi</button></div>`;
+            }
+            window.retryPosesGenerationForCard = async function(cardId, poseText) {
+                const card = document.getElementById(cardId);
+                if (!card || !posesUploadedFileAsDataUrl) { return; }
+                card.classList.remove('border-red-500');
+                card.classList.add('border-gray-600');
+                card.innerHTML = `<div class="w-full aspect-[3/4] flex items-center justify-center bg-gray-900/50"><div class="loader card-loader"></div></div><div class="p-3 text-center"><p class="text-sm text-gray-400">Mencoba lagi...</p></div>`;
+                try {
+                    const base64Data = posesUploadedFileAsDataUrl.split(',')[1];
+                    const mimeType = posesUploadedFileAsDataUrl.split(',')[0].split(':')[1].split(';')[0];
+                    const generatedImageBase64 = await generatePosesImageWithNanoBanana(base64Data, mimeType, poseText);
+                    const imageUrl = `data:image/png;base64,${generatedImageBase64}`;
+                    updatePosesCardWithResult(cardId, imageUrl, poseText);
+                } catch (err) {
+                    console.error(`Gagal mencoba ulang pose "${poseText}":`, err);
+                    updatePosesCardWithError(cardId, poseText, err.message);
+                }
+            }
+            posesUploadArea.addEventListener('dragover', (e) => { e.preventDefault(); posesUploadArea.classList.add('border-cyan-500', 'bg-gray-900/50'); });
+            posesUploadArea.addEventListener('dragleave', () => posesUploadArea.classList.remove('border-cyan-500', 'bg-gray-900/50'));
+            posesUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                posesUploadArea.classList.remove('border-cyan-500', 'bg-gray-900/50');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    posesImageUpload.files = files;
+                    handlePosesFileSelect({ target: posesImageUpload });
+                }
+            });
+            posesImageUpload.addEventListener('change', handlePosesFileSelect);
+            posesSelectPoseBtn.addEventListener('click', () => posesPoseModal.classList.remove('hidden'));
+            posesCancelModalBtn.addEventListener('click', () => posesPoseModal.classList.add('hidden'));
+            posesGenerateBtn.addEventListener('click', runPosesGeneration);
+            
+            // NEW: Listener untuk tombol hapus preview Pose Model
+            posesRemoveImageBtn.addEventListener('click', hidePosesPreview); 
+
+            initializePosesList();
+        })();
+
+        // --- Tab 3: Food Photography Logic ---
+        (function() {
+            const foodImageUploader = document.getElementById('food-image-uploader');
+            const foodFileInput = document.getElementById('food-file-input');
+            const foodUploadPrompt = document.getElementById('food-upload-prompt');
+            const foodImagePreview = document.getElementById('food-image-preview');
+            const foodRemoveBtn = document.getElementById('food-remove-image-btn');
+
+            const styleImageUploader = document.getElementById('food-style-image-uploader');
+            const styleFileInput = document.getElementById('food-style-file-input');
+            const styleUploadPrompt = document.getElementById('food-style-upload-prompt');
+            const styleImagePreview = document.getElementById('food-style-image-preview');
+            const styleRemoveBtn = document.getElementById('food-remove-style-image-btn');
+            
+            const themeSelection = document.getElementById('food-theme-selection');
+            const generateBtn = document.getElementById('food-generate-btn');
+            const loader = document.getElementById('food-loader');
+            const placeholderResult = document.getElementById('food-placeholder-result');
+            const resultContent = document.getElementById('food-result-content');
+            const errorMessage = document.getElementById('food-error-message');
+
+            let foodBase64Image = null;
+            let styleBase64Image = null;
+            let selectedTheme = null;
+
+            // --- FOOD CARD LOGIC ---
+            const stylesAndAngles = [ 
+                'Flat Lay Sempurna (Top-Down)', 
+                'Sudut Klasik 45 Derajat', 
+                'Aksi Dinamis (Contoh: Uap/Tuangan)', 
+                'Tembakan Makro Close-up', 
+                'Gaya Moody dengan Pencahayaan Samping', 
+                'Gaya Bright & Airy (Pencahayaan Tinggi)', 
+                'Minimalis dengan Latar Bersih', 
+                'Komposisi Simetris Elegan', 
+                'Tembakan Handheld Street Food' 
+            ];
+
+            function createFoodCard(id, styleText) {
+                const card = document.createElement('div');
+                card.id = `food-card-${id}`;
+                card.className = 'result-card card p-4 flex flex-col justify-between animate-pulse';
+                card.innerHTML = `
+                    <div><h3 class="text-md font-semibold text-gray-100 mb-4">${styleText}</h3></div>
+                    <div class="food-output-container aspect-square-custom bg-gray-700 rounded-md flex items-center justify-center">
+                        <div class="loader !w-6 !h-6 !border-3"></div>
+                    </div>
+                `;
+                return card;
+            }
+
+            function updateFoodCardWithResult(cardId, imageUrl, styleText) {
+                const card = document.getElementById(cardId);
+                if (!card) return;
+                const outputContainer = card.querySelector('.food-output-container');
+                const titleElement = card.querySelector('h3');
+                const safeTitle = styleText.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                
+                outputContainer.classList.remove('bg-gray-700', 'animate-pulse');
+                titleElement.textContent = styleText;
+
+                // Memasukkan tombol Aksi (Unduh, Caption, Video Prompt)
+                outputContainer.innerHTML = `
+                    <div class="relative w-full h-full group">
+                        <img src="${imageUrl}" class="w-full h-full object-cover rounded-md aspect-square-custom">
+                        <div class="absolute bottom-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                             <button onclick="handleFoodVideoPromptClick('${imageUrl}', '${styleText}', '${selectedTheme}')" class="bg-fuchsia-500 text-white p-2 rounded-full hover:bg-fuchsia-600" title="✨ Buat Prompt Video">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm3 2h6v4H7V5zm8 8H5v-2h10v2z" clip-rule="evenodd" /></svg>
+                            </button>
+                            <button onclick="handleFoodCaptionClick('${imageUrl}', '${styleText}', '${selectedTheme}')" class="bg-rose-500 text-white p-2 rounded-full hover:bg-rose-600" title="✨ Buat Caption">
+                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
+                            </button>
+                            <button onclick="downloadImage('${imageUrl}', 'MTC_FOOD_${cardId}_${safeTitle}.png')" class="bg-indigo-600 text-white p-2 rounded-full hover:bg-indigo-700" title="Unduh Gambar">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                card.classList.remove('animate-pulse');
+            }
+            
+            function updateFoodCardWithError(cardId, styleText, error) {
+                const card = document.getElementById(cardId);
+                if (!card) return;
+                const outputContainer = card.querySelector('.food-output-container');
+                const errorMessage = error.message.substring(0, 50);
+
+                card.classList.remove('animate-pulse');
+                outputContainer.classList.remove('bg-gray-700');
+                outputContainer.classList.add('bg-red-900/30');
+
+                outputContainer.innerHTML = `
+                    <div class="text-xs text-red-400 p-2 text-center" title="${error.message}">
+                        <i class="fas fa-exclamation-triangle text-xl mb-1"></i> Gagal: ${errorMessage}${error.message.length > 50 ? '...' : ''}
+                    </div>
+                `;
+            }
+            // --- END FOOD CARD LOGIC ---
+
+            function setupUploader(uploader, input, preview, prompt, removeBtn, storageCallback) {
+                if (!uploader || !input || !preview || !prompt || !removeBtn) return;
+                
+                function showPreview(fileUrl) {
+                    preview.src = fileUrl;
+                    preview.classList.remove('hidden');
+                    prompt.classList.add('hidden');
+                    removeBtn.classList.remove('hidden');
+                }
+                
+                function hidePreview() {
+                    preview.src = '';
+                    preview.classList.add('hidden');
+                    prompt.classList.remove('hidden');
+                    removeBtn.classList.add('hidden');
+                    input.value = null; // Clear file input
+                }
+
+                uploader.addEventListener('click', (e) => {
+                    // Hanya panggil input.click() jika belum ada gambar di preview
+                    if (preview.classList.contains('hidden') || e.target.closest('button') !== removeBtn) {
+                        input.click();
+                    }
+                });
+                
+                uploader.addEventListener('dragover', (e) => { e.preventDefault(); uploader.classList.add('border-green-400', 'bg-green-50'); });
+                uploader.addEventListener('dragleave', () => { uploader.classList.remove('border-green-400', 'bg-green-50'); });
+                uploader.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploader.classList.remove('border-green-400', 'bg-green-50');
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        input.files = files;
+                        handleFileSelect({ target: { files: files } }, preview, prompt, removeBtn, storageCallback);
+                    }
+                });
+                
+                
+                input.addEventListener('change', (e) => handleFileSelect(e, preview, prompt, removeBtn, storageCallback));
+                
+                removeBtn.addEventListener('click', () => {
+                    hidePreview();
+                    storageCallback(null, null); // Clear stored Base64/MimeType
+                    validateInputs();
+                });
+            }
+
+            function handleFileSelect(event, preview, prompt, removeBtn, storageCallback) {
+                const file = event.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        storageCallback(reader.result.split(',')[1], reader.result.split(',')[0].match(/:(.*?);/)[1]); // Pass base64 data and mime type
+                        preview.src = reader.result;
+                        preview.classList.remove('hidden');
+                        prompt.classList.add('hidden');
+                        removeBtn.classList.remove('hidden'); // Tampilkan tombol hapus
+                        validateInputs();
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                     // Jika file dibatalkan (misal: dialog ditutup tanpa memilih), bersihkan input
+                    preview.src = '';
+                    preview.classList.add('hidden');
+                    prompt.classList.remove('hidden');
+                    removeBtn.classList.add('hidden');
+                    storageCallback(null, null); 
+                    validateInputs();
+                }
+            }
+
+            setupUploader(foodImageUploader, foodFileInput, foodImagePreview, foodUploadPrompt, foodRemoveBtn, (data, mimeType) => {
+                foodBase64Image = data;
+            });
+            setupUploader(styleImageUploader, styleFileInput, styleImagePreview, styleUploadPrompt, styleRemoveBtn, (data, mimeType) => {
+                styleBase64Image = data;
+            });
+            
+            themeSelection.addEventListener('click', (e) => {
+                const button = e.target.closest('.theme-btn');
+                if (button) {
+                    document.querySelectorAll('#food-theme-selection .theme-btn').forEach(btn => btn.classList.remove('selected'));
+                    button.classList.add('selected');
+                    selectedTheme = button.dataset.theme;
+                    validateInputs();
+                }
+            });
+            
+            function clearTheme() {
+                 document.querySelectorAll('#food-theme-selection .theme-btn').forEach(btn => btn.classList.remove('selected'));
+                 selectedTheme = null;
+            }
+
+
+            function validateInputs() {
+                // Generate button should be enabled if:
+                // 1. Food image is present AND (Theme is selected OR Style image is present)
+                const isReady = foodBase64Image && (selectedTheme !== null || styleBase64Image !== null);
+                generateBtn.disabled = !isReady;
+            }
+
+            async function generateImageWithRetry(payload, cardId, styleText, retries = 3, delay = 1000) {
+               for (let i = 0; i < retries; i++) {
+                    try {
+                        const apiKey = "";
+                        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
+                        const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                        const responseText = await response.text();
+                        
+                        let result = {};
+                        try { result = JSON.parse(responseText); } catch (e) { /* silent fail for empty body check later */ }
+
+                        if (!response.ok) {
+                            let errorMsg = result.error?.message || response.statusText;
+                            throw new Error(`API Error: ${response.status} - ${errorMsg}`);
+                        }
+                        
+                        const imagePart = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+                        const base64Data = imagePart?.inlineData?.data;
+
+                        if (base64Data) {
+                            const imageUrl = `data:image/png;base64,${base64Data}`;
+                            updateFoodCardWithResult(cardId, imageUrl, styleText);
+                            return true; // Success
+                        } else {
+                            let reason = "Respon OK tetapi gambar tidak ditemukan.";
+                            if (result.promptFeedback && result.promptFeedback.blockReason) {
+                                reason = `Diblokir: ${result.promptFeedback.blockReason}`;
+                            } else if (result?.candidates?.[0]?.finishReason) {
+                                reason = `Selesai dengan alasan: ${result.candidates[0].finishReason}`;
+                            }
+                            throw new Error(reason);
+                        }
+
+                    } catch (error) {
+                        console.error(`Attempt ${i + 1} for ${cardId} failed:`, error);
+                        if (i === retries - 1) {
+                             updateFoodCardWithError(cardId, styleText, error);
+                             return false; // Final failure
+                        }
+                        await new Promise(res => setTimeout(res, delay * Math.pow(2, i)));
+                    }
+                }
+                return false; // Should not be reached
+            }
+
+            generateBtn.addEventListener('click', async () => {
+                validateInputs();
+                if (generateBtn.disabled) { showError("Unggah foto makanan dan pilih tema atau gambar referensi."); return; }
+                
+                // 1. Initial State Setup
+                generateBtn.disabled = true;
+                generateBtn.innerHTML = `<div class="loader !w-6 !h-6 !border-3" style="border-left-color: #fff; width: 24px; height: 24px;"></div>`;
+                showError('');
+                
+                placeholderResult.classList.add('hidden'); // Hide big initial placeholder
+                resultContent.classList.remove('hidden');
+                resultContent.innerHTML = ''; // Clear previous results
+
+                // 2. Create Dynamic Placeholders and start generations
+                const generationPromises = stylesAndAngles.map((style, index) => {
+                    const cardId = index + 1;
+                    resultContent.appendChild(createFoodCard(cardId, style));
+                    
+                    let prompt = '';
+                    const parts = [];
+                    const mimeType = "image/jpeg"; // Assuming common image type
+                    
+                    // Tambahkan instruksi rasio 1:1
+                    const ratioInstruction = ', square format, 1:1 aspect ratio, 1024x1024, high resolution, professional commercial food photography';
+
+                    if (styleBase64Image) {
+                        prompt = `IMPORTANT: Your task is to place the food from the first image into the exact scene of the second image. The final output MUST perfectly replicate the composition, camera angle, and lighting from the second uploaded image. The setting and photographic style must be identical. The food from the first image is the new subject, but it must be integrated photorealistically into the replicated scene.`;
+                        if (selectedTheme) { prompt += ` The overall mood should have a '${selectedTheme}' feel.`; }
+                        prompt += ratioInstruction; // Tambahkan instruksi rasio
+                        parts.push({ text: prompt });
+                        parts.push({ inlineData: { mimeType: mimeType, data: foodBase64Image } });
+                        parts.push({ inlineData: { mimeType: mimeType, data: styleBase64Image } });
+                    } else {
+                        prompt = `Create a professional, esthetic photograph featuring the exact food from the uploaded image. The overall setting is '${selectedTheme || 'general food photography'}'. The specific photographic style is a '${style}'. The image must be high quality, sharp focus, with beautiful lighting and cinematic composition suitable for that style.`;
+                        prompt += ratioInstruction; // Tambahkan instruksi rasio
+                        parts.push({ text: prompt });
+                        parts.push({ inlineData: { mimeType: mimeType, data: foodBase64Image } });
+                    }
+                    
+                    const payload = { contents: [{ parts }], generationConfig: { responseModalities: ['IMAGE'] } };
+                    
+                    // 3. Start Generation (Run immediately and map the promise)
+                    return generateImageWithRetry(payload, `food-card-${cardId}`, style);
+                });
+                
+                // Wait for all generations to finish
+                await Promise.all(generationPromises);
+
+                // 4. Final State Update
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = `<i class="fas fa-magic mr-2"></i>Generate 9 Gambar`;
+            });
+
+            function handleDownloadClick(event) {
+                const downloadBtn = event.target.closest('.download-btn');
+                if (!downloadBtn) return;
+                event.preventDefault(); 
+                const imageUrl = downloadBtn.dataset.url;
+                const fileName = downloadBtn.dataset.filename;
+                if (imageUrl && fileName) {
+                    // Use the global, mobile-friendly download function
+                    downloadImage(imageUrl, fileName);
+                } else {
+                    console.error("Download failed: URL or filename missing from data attributes.");
+                    showError("Gagal mengunduh, data tidak lengkap.");
+                }
+            }
+            
+            resultContent.addEventListener('click', handleDownloadClick);
+            
+            function showLoading(isLoading) {
+                // This function is now mainly used to manage the primary loader state, 
+                // but since we are using dynamic card loaders, we can simplify this.
+                // We'll just manage the button state directly in generateBtn.addEventListener.
+                // However, keep the function for showError compatibility if needed.
+            }
+
+            function showError(message) {
+                errorMessage.textContent = message;
+                if (message) {
+                    errorMessage.classList.remove('hidden');
+                    placeholderResult.classList.add('hidden');
+                    resultContent.classList.add('hidden');
+                } else {
+                    errorMessage.classList.add('hidden');
+                }
+            }
+            validateInputs();
+
+            // --- NEW FOOD ACTION HANDLERS ---
+            window.handleFoodCaptionClick = async function(imageUrl, styleTitle, theme) {
+                showModal('✨ Caption Media Sosial Makanan', `<div class="flex flex-col items-center gap-4"><div class="loader"></div> <p class="text-gray-400">AI sedang meracik caption...</p></div>`);
+                try {
+                    const parts = imageUrl.split(',');
+                    const mimeType = parts[0].match(/:(.*?);/)[1];
+                    const base64Data = parts[1];
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                    
+                    const systemPrompt = `You are a creative food blogger and social media manager. Based on the food photo, its visual style ('${styleTitle}'), and its theme ('${theme}'), write an engaging Instagram caption in Indonesian. The caption should evoke appetite, be concise, and end with 3-5 relevant hashtags.`;
+                    
+                    const userQuery = `Buat caption untuk foto makanan dengan gaya: "${styleTitle}" dan tema: "${theme}".`;
+
+                    const payload = {
+                        contents: [{ parts: [ { text: userQuery }, { inlineData: { mimeType: mimeType, data: base64Data } } ] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] }
+                    };
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`); }
+                    const result = await response.json();
+                    const caption = result.candidates[0].content.parts[0].text;
+                    const content = `
+                        <div id="modal-text-content" class="whitespace-pre-wrap bg-gray-700 p-4 rounded-lg text-gray-300 mb-4">${caption.trim()}</div>
+                        <button id="copy-modal-btn" class="w-full btn-primary font-bold py-2 px-4 rounded-lg flex items-center justify-center">Salin Caption</button>
+                    `;
+                    showModal('✨ Caption Media Sosial Makanan', content);
+                    document.getElementById('copy-modal-btn').addEventListener('click', (e) => {
+                        const text = document.getElementById('modal-text-content').innerText;
+                        copyToClipboard(text, e.currentTarget);
+                    });
+                } catch (error) {
+                    console.error("Error generating food caption:", error);
+                    showModal('Error', `<p class="text-red-400">Gagal membuat caption makanan. Silakan coba lagi.</p>`);
+                }
+            }
+
+            window.handleFoodVideoPromptClick = async function(imageUrl, styleTitle, theme) {
+                showModal('✨ Prompt Image-to-Video Makanan', `<div class="flex flex-col items-center gap-4"><div class="loader"></div> <p class="text-gray-400">AI sedang menganalisa gerakan makanan...</p></div>`);
+                try {
+                    const parts = imageUrl.split(',');
+                    const mimeType = parts[0].match(/:(.*?);/)[1];
+                    const base64Data = parts[1];
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
+                    
+                    const systemPrompt = `You are an AI food videography expert. Based on the provided food image, its visual style ('${styleTitle}'), and its theme ('${theme}'), generate a concise, highly creative image-to-video prompt in English. The prompt must strictly follow the formula: "food item + subtle, appetizing action (e.g., steam rising, gentle shake, slow zoom, pouring sauce) + background details + cinematic camera movement". Focus on enhancing the food's visual appeal through motion. The output MUST be a single, concise English prompt suitable for a video generation AI.`;
+                    
+                    const userQuery = `Buatkan prompt video yang menganalisis gambar makanan dengan gaya: "${styleTitle}" dan tema: "${theme}".`;
+
+                    const payload = {
+                        contents: [{ parts: [ { text: userQuery }, { inlineData: { mimeType: mimeType, data: base64Data } } ] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] }
+                    };
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`); }
+                    const result = await response.json();
+                    const prompt = result.candidates[0].content.parts[0].text;
+                    
+                    const content = `
+                        <p class="text-gray-400 mb-2">Prompt ini siap digunakan di Veo, Grok, atau generator video AI lainnya:</p>
+                        <div id="modal-text-content" class="whitespace-pre-wrap bg-gray-700 p-4 rounded-lg text-gray-300 mb-4 font-mono">${prompt.trim()}</div>
+                        <button id="copy-modal-btn" class="w-full btn-primary font-bold py-2 px-4 rounded-lg flex items-center justify-center">Salin Prompt</button>
+                    `;
+                    showModal('✨ Prompt Image-to-Video Makanan', content);
+                    document.getElementById('copy-modal-btn').addEventListener('click', (e) => {
+                        const text = document.getElementById('modal-text-content').innerText;
+                        copyToClipboard(text, e.currentTarget);
+                    });
+                } catch (error) {
+                    console.error("Error generating food video prompt:", error);
+                    showModal('Error', `<p class="text-red-400">Gagal membuat prompt video makanan. Silakan coba lagi.</p>`);
+                }
+            }
+            // --- END NEW FOOD ACTION HANDLERS ---
+        })();
+
+
+        // --- Tab 5: Voice Over Logic ---
+        (function() {
+            const container = document.getElementById('content-voiceover');
+            if (!container) return; // Don't run if the container doesn't exist
+
+            // MEMPERBAIKI JS: Mendefinisikan semua elemen UI
+            // Script Generator
+            const generateScriptBtn = container.querySelector('#vo-generate-script-btn');
+            const scriptPurposeSelect = container.querySelector('#vo-script-purpose');
+            const scriptDurationInput = container.querySelector('#vo-script-duration');
+            const scriptTopicInput = container.querySelector('#vo-script-topic');
+ 
+            // Main elements
+            const textInput = container.querySelector('#vo-text-input');
+            const styleInput = container.querySelector('#vo-style-input');
+            const voiceList = container.querySelector('#vo-voice-list'); // Ini perbaikan untuk error
+            const generateBtn = container.querySelector('#vo-generate-btn');
+            const charCounter = container.querySelector('#vo-char-counter');
+            const clearTextBtn = container.querySelector('#vo-clear-text-btn');
+            const copyTextBtn = container.querySelector('#vo-copy-text-btn');
+
+            // Sliders
+            const pitchSlider = container.querySelector('#vo-pitch-slider');
+            const pitchValue = container.querySelector('#vo-pitch-value');
+            const resetPitchBtn = container.querySelector('#vo-reset-pitch-btn');
+            const volumeSlider = container.querySelector('#vo-volume-slider');
+            const volumeValue = container.querySelector('#vo-volume-value');
+            const resetVolumeBtn = container.querySelector('#vo-reset-volume-btn');
+            
+            // Result area
+            const resultContainer = container.querySelector('#vo-result-container');
+            const loaderContainer = container.querySelector('#vo-loader-container');
+            const audioContainer = container.querySelector('#vo-audio-container');
+            const audioPlayer = container.querySelector('#vo-audio-player');
+            const downloadBtn = container.querySelector('#vo-download-btn');
+            const errorMessageElem = container.querySelector('#vo-error-message');
+
+            // Modal
+            const guidanceModal = container.querySelector('#vo-guidance-modal');
+            const openGuidanceBtn = container.querySelector('#vo-open-guidance-btn');
+            const closeGuidanceBtn = container.querySelector('#vo-close-guidance-btn');
+            const understandBtn = container.querySelector('#vo-understand-btn');
+
+            // Constants
+            const CHAR_LIMIT = 5000;
+            const previewText = "Halo, ini adalah pratinjau suara yang Anda pilih.";
+
+            const voices = [
+                { name: "Puck", gender: "Pria", id: "Puck" }, { name: "Kore", gender: "Wanita", id: "Kore" },
+                { name: "Zephyr", gender: "Wanita", id: "Zephyr" }, { name: "Fenrir", gender: "Pria", id: "Fenrir" },
+                { name: "Achird", gender: "Pria", id: "Achird"}, { name: "Charon", gender: "Pria", id: "Charon" },
+                { name: "Sadachbia", gender: "Pria", id: "Sadachbia" }, { name: "Sulafat", gender: "Wanita", id: "Sulafat" },
+                { name: "Aoede", gender: "Wanita", id: "Aoede" }, { name: "Umbriel", gender: "Pria", id: "Umbriel" },
+                { name: "Gacrux", gender: "Wanita", id: "Gacrux"}, { name: "Leda", gender: "Wanita", id: "Leda" },
+                { name: "Orus", gender: "Pria", id: "Orus" }, { name: "Enceladus", gender: "Pria", id: "Enceladus" },
+                { name: "Algenib", gender: "Pria", id: "Algenib" }, { name: "Vindemiatrix", gender: "Wanita", id: "Vindemiatrix" },
+                { name: "Sadaltager", gender: "Pria", id: "Sadaltager" }, { name: "Schedar", gender: "Pria", id: "Schedar" },
+                { name: "Iapetus", gender: "Pria", id: "Iapetus" },
+            ];
+            
+            let selectedVoiceId = voices.length > 0 ? voices[0].id : null;
+            let currentPreviewAudio = null;
+
+            // MEMPERBAIKI JS: Mendefinisikan fungsi helper di dalam IIFE
+            function showError(message) {
+                if (!errorMessageElem) return;
+                if (message) {
+                    errorMessageElem.textContent = message;
+                    errorMessageElem.classList.remove('hidden');
+                } else {
+                    errorMessageElem.textContent = '';
+                    errorMessageElem.classList.add('hidden');
+                }
+            }
+
+            function base64ToArrayBuffer(base64) {
+                const binaryString = window.atob(base64); const len = binaryString.length; const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) { bytes[i] = binaryString.charCodeAt(i); } return bytes.buffer;
+            }
+            
+            function pcmToWav(pcmData, sampleRate) {
+                const numChannels = 1; const bitsPerSample = 16; const blockAlign = (numChannels * bitsPerSample) / 8;
+                const byteRate = sampleRate * blockAlign; const dataSize = pcmData.byteLength; const buffer = new ArrayBuffer(44 + dataSize);
+                const view = new DataView(buffer);
+                function writeString(view, offset, string) { for (let i = 0; i < string.length; i++) { view.setUint8(offset + i, string.charCodeAt(i)); } }
+                writeString(view, 0, 'RIFF'); view.setUint32(4, 36 + dataSize, true); writeString(view, 8, 'WAVE');
+                writeString(view, 12, 'fmt '); view.setUint32(16, 16, true); view.setUint16(20, 1, true); 
+                view.setUint16(22, numChannels, true); view.setUint32(24, sampleRate, true); view.setUint32(28, byteRate, true);
+                view.setUint16(32, blockAlign, true); view.setUint16(34, bitsPerSample, true); writeString(view, 36, 'data');
+                view.setUint32(40, dataSize, true);
+                const pcm16 = new Int16Array(pcmData);
+                for (let i = 0; i < pcm16.length; i++) {
+                    view.setInt16(44 + i * 2, pcm16[i], true);
+                }
+                return new Blob([view], { type: 'audio/wav' });
+            }
+
+            // MEMPERBAIKI JS: Mendefinisikan fungsi generateSpeech
+            async function generateSpeech(text, voiceId, pitch, volume) {
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+                
+                let processedText = text;
+                const style = styleInput.value.trim();
+                if (style && text === previewText) { // Hanya tambahkan style jika BUKAN preview
+                    // jangan tambahkan style untuk preview
+                } else if (style) {
+                     processedText = `Say with this style "${style}": ${text}`;
+                }
+
+                const payload = {
+                    contents: [{
+                        parts: [{ text: processedText }]
+                    }],
+                    generationConfig: {
+                        responseModalities: ["AUDIO"],
+                        speechConfig: {
+                            voiceConfig: {
+                                prebuiltVoiceConfig: { voiceName: voiceId }
+                            },
+                            pitch: pitch,
+                            volumeGainDb: volume
+                        }
+                    },
+                    model: "gemini-2.5-flash-preview-tts"
+                };
+
+                const response = await fetch(apiUrl, {
+>>>>>>> parent of 875edcb (add apikey)
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -281,10 +2503,201 @@
             document.getElementById('vo-text-input').value = res;
         });
 
+<<<<<<< HEAD
         // Modal Logic
         const modal = document.getElementById('universal-modal');
         document.getElementById('close-modal-btn').onclick = () => modal.classList.remove('visible');
         window.onclick = (e) => { if(e.target == modal) modal.classList.remove('visible'); }
+=======
+                if (!topic) {
+                    showError('Mohon masukkan Topik/Ide Utama untuk membuat naskah.');
+                    scriptTopicInput.focus();
+                    return;
+                }
+
+                // Validasi baru untuk durasi manual
+                if (!durationText) {
+                    showError('Mohon masukkan Perkiraan Durasi untuk membuat naskah.');
+                    scriptDurationInput.focus();
+                    return;
+                }
+
+                // Set loading state for the script button
+                const originalBtnText = generateScriptBtn.innerHTML;
+                generateScriptBtn.innerHTML = `<div class="loader !w-4 !h-4 !border-2"></div>`;
+                generateScriptBtn.disabled = true;
+                showError(''); // Clear any previous errors
+
+                try {
+                    const apiKey = ""; // API key is handled by the environment
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                    
+                    const systemPrompt = "Anda adalah penulis naskah profesional untuk voice-over. Buat naskah yang ringkas, jelas, dan menarik berdasarkan permintaan pengguna. Naskah harus dalam Bahasa Indonesia. PENTING: Tulis naskah sebagai satu paragraf yang mengalir, bukan sebagai daftar poin atau dialog. Naskah harus merupakan hasil final yang siap dibacakan, jadi jangan sertakan instruksi, tanda kurung, atau placeholder (contoh: '[isi kode voucher di sini]'). Hasilkan naskah lengkap secara langsung.";
+                    const userQuery = `Tulis naskah voice-over dengan tujuan: "${purpose}".
+Topik: "${topic}".
+Perkiraan durasi audio: "${durationText}".
+Hasil naskah final (satu paragraf, tanpa placeholder):`;
+
+                    const payload = {
+                        contents: [{ parts: [{ text: userQuery }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] }
+                    };
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const script = result.candidates[0].content.parts[0].text;
+                    
+                    textInput.value = script.trim();
+                    textInput.dispatchEvent(new Event('input')); // Update character counter
+                    textInput.focus();
+
+                } catch (error) {
+                    console.error("Error generating script:", error);
+                    showError(`Gagal membuat naskah: ${error.message}`);
+                } finally {
+                    // Restore button
+                    generateScriptBtn.innerHTML = originalBtnText;
+                    generateScriptBtn.disabled = false;
+                }
+            }
+            generateScriptBtn?.addEventListener('click', handleGenerateScript);
+            // END NEW SCRIPT GENERATION LOGIC
+
+        })();
+
+        // --- Tab 6: Caption Generator Logic (BARU) ---
+        (function() {
+            const container = document.getElementById('content-caption');
+            if (!container) return; // Jangan jalankan jika tab tidak ada
+
+            const topicInput = container.querySelector('#caption-topic-input');
+            const generateBtn = container.querySelector('#caption-generate-btn');
+            const resultContainer = container.querySelector('#caption-result-container');
+            const loader = container.querySelector('#caption-loader');
+            const resultOutput = container.querySelector('#caption-result-output');
+            const textArea = container.querySelector('#caption-text-area');
+            const copyBtn = container.querySelector('#copy-caption-btn');
+            const errorMessage = container.querySelector('#caption-error-message');
+
+            generateBtn.addEventListener('click', handleGenerateCaption);
+            
+            copyBtn.addEventListener('click', () => {
+                const textToCopy = textArea.innerText;
+                if (textToCopy) {
+                    // Menggunakan fungsi copyToClipboard global yang sudah ada
+                    copyToClipboard(textToCopy, copyBtn);
+                }
+            });
+            
+            async function handleGenerateCaption() {
+                const topic = topicInput.value.trim();
+
+                if (!topic) {
+                    showCaptionError("Silakan masukkan produk atau topik terlebih dahulu.");
+                    topicInput.focus();
+                    return;
+                }
+
+                // Tampilkan UI loading
+                const originalBtnText = generateBtn.innerHTML;
+                generateBtn.innerHTML = `<div class="loader !w-6 !h-6 !border-3" style="border-left-color: #fff; width: 24px; height: 24px;"></div>`;
+                generateBtn.disabled = true;
+                showCaptionError('');
+                resultContainer.classList.remove('hidden');
+                loader.classList.remove('hidden');
+                loader.classList.add('flex');
+                resultOutput.classList.add('hidden');
+
+                try {
+                    const apiKey = ""; // API key is handled by the environment
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                    
+                    // Prompt sistem sesuai permintaan pengguna
+                    const systemPrompt = "You are a social media SEO expert and copywriter. Your task is to create a highly persuasive and short caption for the given product/topic. The caption must be engaging and not too long. At the end, add EXACTLY 5 (five) of the most relevant hashtags with strong SEO potential. Respond only in Indonesian.";
+                    const userQuery = `Buat caption untuk produk/topik ini: "${topic}"`;
+
+                    const payload = {
+                        contents: [{ parts: [{ text: userQuery }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] }
+                    };
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    if (!result.candidates || !result.candidates[0].content || !result.candidates[0].content.parts[0].text) {
+                        throw new Error("Respons API tidak valid atau kosong.");
+                    }
+
+                    const caption = result.candidates[0].content.parts[0].text;
+                    
+                    textArea.innerText = caption.trim(); // Gunakan innerText untuk menjaga format
+                    loader.classList.add('hidden');
+                    loader.classList.remove('flex');
+                    resultOutput.classList.remove('hidden');
+
+                } catch (error) {
+                    console.error("Error generating caption:", error);
+                    showCaptionError(`Gagal membuat caption: ${error.message}`);
+                    loader.classList.add('hidden');
+                    loader.classList.remove('flex');
+                } finally {
+                    // Restore button
+                    generateBtn.innerHTML = originalBtnText;
+                    generateBtn.disabled = false;
+                }
+            }
+
+            function showCaptionError(message) {
+                errorMessage.textContent = message;
+                if (message) {
+                    errorMessage.classList.remove('hidden');
+                } else {
+                    errorMessage.classList.add('hidden');
+                }
+            }
+        })();
+
+
+        // --- Tab 7: UGC Prompt Generator Logic (OLD, REMOVED) ---
+        // (function() { ... })(); // Logic removed as it is now in the React component
+
+        // --- Support Dropdown Logic ---
+        (function() {
+            const supportBtn = document.getElementById('support-btn');
+            const supportDropdown = document.getElementById('support-dropdown');
+
+            supportBtn.addEventListener('click', (event) => {
+                event.stopPropagation();
+                supportDropdown.classList.toggle('hidden');
+            });
+
+            window.addEventListener('click', (event) => {
+                if (!supportDropdown.classList.contains('hidden') && !supportBtn.contains(event.target)) {
+                    supportDropdown.classList.add('hidden');
+                }
+            });
+        })();
+>>>>>>> parent of 875edcb (add apikey)
 
     </script>
 </body>

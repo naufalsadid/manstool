@@ -1858,7 +1858,7 @@ Final Visual Prompt: ${visualDescription}
 
             // Helper function to call the image generation API
             const generateSingleStoryVisual = async (scenePrompt, base64Data, mimeType) => {
-                const apiKey = "";
+                const apiKey = "AIzaSyB1npkhRfQIPl4iZkQU_ncTaXBDo0lWf6A";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
                 
                 // --- Ratio Logic ---
@@ -2738,7 +2738,7 @@ Final Visual Prompt: ${visualDescription}
             });
 
             async function analyzeAndGetPrompts() {
-                const apiKey = "";
+                const apiKey = "AIzaSyB1npkhRfQIPl4iZkQU_ncTaXBDo0lWf6A";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                 const orientation = document.querySelector('input[name="broll-orientation"]:checked').value;
                 
@@ -2810,7 +2810,7 @@ Final Visual Prompt: ${visualDescription}
 
                 for (let i = 0; i < retries; i++) {
                     try {
-                        const apiKey = "";
+                        const apiKey = "AIzaSyB1npkhRfQIPl4iZkQU_ncTaXBDo0lWf6A";
                         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
                         
                         let finalPrompt = '';
@@ -2923,7 +2923,7 @@ Final Visual Prompt: ${visualDescription}
                 brollGenerateDescBtn.innerHTML = `<div class="loader !w-4 !h-4 !border-2"></div>`;
                 brollGenerateDescBtn.disabled = true;
                 try {
-                    const apiKey = "";
+                    const apiKey = "AIzaSyB1npkhRfQIPl4iZkQU_ncTaXBDo0lWf6A";
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                     const systemPrompt = `You are a professional copywriter. Analyze the product in the image and write a concise, compelling, and SEO-friendly product description in Indonesian. Highlight its key features and potential benefits for customers. Keep it under 500 characters.`;
                     const userQuery = `Buatkan deskripsi produk untuk gambar ini.`;
@@ -2956,7 +2956,7 @@ Final Visual Prompt: ${visualDescription}
                     const parts = imageUrl.split(',');
                     const mimeType = parts[0].match(/:(.*?);/)[1];
                     const base64Data = parts[1];
-                    const apiKey = "";
+                    const apiKey = "AIzaSyB1npkhRfQIPl4iZkQU_ncTaXBDo0lWf6A";
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                     const systemPrompt = `You are a creative social media manager. Based on the product photo, description, and theme, write an engaging Instagram caption in Indonesian. It should be appealing, concise, and end with 3-5 relevant hashtags.`;
                     const userQuery = `Product Description: "${brollProductDescInput.value.trim()}"\nPhoto Theme: "${title}"`;
@@ -2989,7 +2989,7 @@ Final Visual Prompt: ${visualDescription}
                     const parts = imageUrl.split(',');
                     const mimeType = parts[0].match(/:(.*?);/)[1];
                     const base64Data = parts[1];
-                    const apiKey = "";
+                    const apiKey = "AIzaSyB1npkhRfQIPl4iZkQU_ncTaXBDo0lWf6A";
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
                     const systemPrompt = `You are an AI video generation expert. Based on the provided image, its theme, and the product description, generate a concise image-to-video prompt in English. The prompt must strictly follow the formula: "subject + what it's doing (action) + background + camera movement)". Infer the most logical and visually appealing motion from the static image for the 'action' part, such as walking, turning, or posing on a catwalk. Then, add a suitable 'camera movement' to make the shot more cinematic (e.g., 'slow zoom in', 'panning from left to right', 'dolly shot forward'). Be creative and focus on creating a dynamic, cinematic shot suitable for a fashion showcase.`;
                     const userQuery = `Product Description: "${brollProductDescInput.value.trim()}"\nPhoto Theme: "${title}"`;
@@ -3138,7 +3138,7 @@ Final Visual Prompt: ${visualDescription}
                 posesSelectPoseBtn.disabled = false;
             }
             async function generatePosesImageWithNanoBanana(base64ImageData, mimeType, prompt) {
-                const apiKey = "";
+                const apiKey = "AIzaSyB1npkhRfQIPl4iZkQU_ncTaXBDo0lWf6A";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
                 const payload = {
                     contents: [{
@@ -3431,7 +3431,7 @@ Final Visual Prompt: ${visualDescription}
             async function generateImageWithRetry(payload, cardId, styleText, retries = 3, delay = 1000) {
                for (let i = 0; i < retries; i++) {
                     try {
-                        const apiKey = "";
+                        const apiKey = "AIzaSyB1npkhRfQIPl4iZkQU_ncTaXBDo0lWf6A";
                         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
                         const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                         const responseText = await response.text();
@@ -3569,7 +3569,7 @@ Final Visual Prompt: ${visualDescription}
                     const parts = imageUrl.split(',');
                     const mimeType = parts[0].match(/:(.*?);/)[1];
                     const base64Data = parts[1];
-                    const apiKey = "";
+                    const apiKey = "AIzaSyB1npkhRfQIPl4iZkQU_ncTaXBDo0lWf6A";
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                     
                     const systemPrompt = `You are a creative food blogger and social media manager. Based on the food photo, its visual style ('${styleTitle}'), and its theme ('${theme}'), write an engaging Instagram caption in Indonesian. The caption should evoke appetite, be concise, and end with 3-5 relevant hashtags.`;
@@ -3605,7 +3605,7 @@ Final Visual Prompt: ${visualDescription}
                     const parts = imageUrl.split(',');
                     const mimeType = parts[0].match(/:(.*?);/)[1];
                     const base64Data = parts[1];
-                    const apiKey = "";
+                    const apiKey = "AIzaSyB1npkhRfQIPl4iZkQU_ncTaXBDo0lWf6A";
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
                     
                     const systemPrompt = `You are an AI food videography expert. Based on the provided food image, its visual style ('${styleTitle}'), and its theme ('${theme}'), generate a concise, highly creative image-to-video prompt in English. The prompt must strictly follow the formula: "food item + subtle, appetizing action (e.g., steam rising, gentle shake, slow zoom, pouring sauce) + background details + cinematic camera movement". Focus on enhancing the food's visual appeal through motion. The output MUST be a single, concise English prompt suitable for a video generation AI.`;
@@ -3739,7 +3739,7 @@ Final Visual Prompt: ${visualDescription}
 
             // MEMPERBAIKI JS: Mendefinisikan fungsi generateSpeech
             async function generateSpeech(text, voiceId, pitch, volume) {
-                const apiKey = "";
+                const apiKey = "AIzaSyB1npkhRfQIPl4iZkQU_ncTaXBDo0lWf6A";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
                 
                 let processedText = text;
@@ -3974,7 +3974,7 @@ Final Visual Prompt: ${visualDescription}
                 showError(''); // Clear any previous errors
 
                 try {
-                    const apiKey = ""; // API key is handled by the environment
+                    const apiKey = "AIzaSyB1npkhRfQIPl4iZkQU_ncTaXBDo0lWf6A"; // API key is handled by the environment
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                     
                     const systemPrompt = "Anda adalah penulis naskah profesional untuk voice-over. Buat naskah yang ringkas, jelas, dan menarik berdasarkan permintaan pengguna. Naskah harus dalam Bahasa Indonesia. PENTING: Tulis naskah sebagai satu paragraf yang mengalir, bukan sebagai daftar poin atau dialog. Naskah harus merupakan hasil final yang siap dibacakan, jadi jangan sertakan instruksi, tanda kurung, atau placeholder (contoh: '[isi kode voucher di sini]'). Hasilkan naskah lengkap secara langsung.";
@@ -4064,7 +4064,7 @@ Hasil naskah final (satu paragraf, tanpa placeholder):`;
                 resultOutput.classList.add('hidden');
 
                 try {
-                    const apiKey = ""; // API key is handled by the environment
+                    const apiKey = "AIzaSyB1npkhRfQIPl4iZkQU_ncTaXBDo0lWf6A"; // API key is handled by the environment
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                     
                     // Prompt sistem sesuai permintaan pengguna
